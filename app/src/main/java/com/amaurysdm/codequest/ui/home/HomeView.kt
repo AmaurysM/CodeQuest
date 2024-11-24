@@ -149,11 +149,7 @@ fun HomeView(
                 }
 
                 Button(
-                    onClick = {homeViewmodel.startGame(navController)
-                        //GlobalScope.launch {
-
-                        //}
-                    },
+                    onClick = {homeViewmodel.startGame(navController) },
                     shape = MaterialTheme.shapes.small,
                     modifier = Modifier.fillMaxWidth().size(100.dp,100.dp)
                 ) {
@@ -161,6 +157,11 @@ fun HomeView(
                 }
 
             }
+            Button(
+                onClick = { homeViewmodel.logout(navController) },
+                shape = MaterialTheme.shapes.small,
+                modifier = Modifier.size(100.dp,100.dp)
+            ){Text(text = "Logout")}
 
         }
     }

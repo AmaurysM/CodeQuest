@@ -8,8 +8,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import com.amaurysdm.codequest.model.AuthManager
-import com.amaurysdm.codequest.model.AuthState
 import com.amaurysdm.codequest.ui.home.HomeView
 import com.amaurysdm.codequest.ui.login.LoginView
 import com.amaurysdm.codequest.ui.register.RegisterView

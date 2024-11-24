@@ -10,22 +10,29 @@ import com.amaurysdm.codequest.navigation.CodeQuestScreens
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.tasks.await
 
-class RegisterViewmodel: ViewModel() {
+class RegisterViewmodel : ViewModel() {
     var registerData by mutableStateOf(RegisterData())
-    //val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
-    private val auth: FirebaseAuth  = FirebaseAuth.getInstance()
 
-    suspend fun register(navController: NavHostController){
-        if(registerData.password != registerData.confirmPassword){
+    private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
+
+    fun register(navController: NavHostController) {
+        if (registerData.email.isEmpty() || registerData.password.isEmpty() || registerData.confirmPassword.isEmpty()) {
             return
         }
-        auth.createUserWithEmailAndPassword(registerData.email, registerData.password).await()
-        if(auth.currentUser != null){
-            navController.navigate(CodeQuestScreens.Login.route)
+
+        if (registerData.password != registerData.confirmPassword) {
+            return
         }
+
+        auth.createUserWithEmailAndPassword(registerData.email, registerData.password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    navController.navigate(CodeQuestScreens.Login.route)
+                }
+            }
     }
 
-    fun goBack(navController: NavHostController){
+    fun goBack(navController: NavHostController) {
         navController.popBackStack()
     }
 

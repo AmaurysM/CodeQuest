@@ -36,16 +36,16 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.amaurysdm.codequest.CreateText
 import com.amaurysdm.codequest.R
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import com.amaurysdm.codequest.TitleAnimation
 
 @Composable
 fun HomeView(
     navController: NavHostController = rememberNavController(),
     homeViewmodel: HomeViewmodel = viewModel()
 ){
+    val titleAnimation = TitleAnimation()
     Box(modifier = Modifier.fillMaxWidth()) {
         Image(
             bitmap = ImageBitmap.imageResource(id = R.drawable.grass_background),
@@ -53,35 +53,6 @@ fun HomeView(
             modifier = Modifier.fillMaxSize(),
             alignment = Alignment.Center,
             contentScale = ContentScale.FillHeight
-        )
-
-        val infiniteTransition = rememberInfiniteTransition()
-        val bobbing = infiniteTransition.animateFloat(
-            initialValue = 0f,
-            targetValue = 100f,
-            label = "bobbing logo",
-            animationSpec = infiniteRepeatable(
-                animation = keyframes {
-                    durationMillis = 3000
-                    50f at 0
-                    -50f at 1500 with FastOutLinearInEasing
-                    50f at 3000
-                }
-            )
-        )
-
-        val rotation = infiniteTransition.animateFloat(
-            initialValue = 0f,
-            targetValue = 15f,
-            label = "rotation logo",
-            animationSpec = infiniteRepeatable(
-                animation = keyframes {
-                    durationMillis = 3000
-                    -15f at 0 with FastOutLinearInEasing
-                    15f at 1500
-                    -15f at 3000 with FastOutSlowInEasing
-                }
-            )
         )
 
         Column(
@@ -94,46 +65,18 @@ fun HomeView(
 
             Column(
                 modifier = Modifier.fillMaxWidth().fillMaxHeight(0.8f),
-                horizontalAlignment = Alignment.Start,
+                horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                val TEXT = "CodeQuest"
-                val TEXT_SIZE = 180f
-                val OUTLINE_WIDTH = 110f
-                val X_POSITION = 50f
-                val Y_POSITION = 0f
-
-                val outlinePaint = android.graphics.Paint().apply {
-                    textSize = TEXT_SIZE
-                    style = android.graphics.Paint.Style.STROKE
-                    strokeWidth = OUTLINE_WIDTH
-                    color = MaterialTheme.colorScheme.primary.toArgb()
-                }
-
-                val fillPaint = android.graphics.Paint().apply {
-                    color = MaterialTheme.colorScheme.onPrimary.toArgb()
-                    textSize = TEXT_SIZE
-                    style = android.graphics.Paint.Style.FILL
-
-                }
-
-                Canvas(modifier = Modifier
-                    .offset( y = bobbing.value.dp)
-                    .rotate(rotation.value)
-                ) {
-                    drawContext.canvas.nativeCanvas.drawText(
-                        TEXT,
-                        X_POSITION,
-                        Y_POSITION,
-                        outlinePaint
-                    )
-                    drawContext.canvas.nativeCanvas.drawText(
-                        TEXT,
-                        X_POSITION,
-                        Y_POSITION,
-                        fillPaint
-                    )
-                }
+                CreateText(
+                    text = "CodeQuest",
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    style = MaterialTheme.typography.headlineLarge,
+                    textSize = 180f,
+                    outlineWidth = 110f,
+                    bobbing = titleAnimation.first,
+                    rotation = titleAnimation.second
+                )
             }
 
             Row(
@@ -157,6 +100,7 @@ fun HomeView(
                 }
 
             }
+
             Button(
                 onClick = { homeViewmodel.logout(navController) },
                 shape = MaterialTheme.shapes.small,

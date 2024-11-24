@@ -6,9 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import com.amaurysdm.codequest.model.RegisterData
-import com.amaurysdm.codequest.navigation.CodeQuestScreens
+import com.amaurysdm.codequest.navigation.Screens
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.tasks.await
 
 class RegisterViewmodel : ViewModel() {
     var registerData by mutableStateOf(RegisterData())
@@ -27,7 +26,7 @@ class RegisterViewmodel : ViewModel() {
         auth.createUserWithEmailAndPassword(registerData.email, registerData.password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    navController.navigate(CodeQuestScreens.Login.route)
+                    navController.navigate(Screens.UserCreationChild.Login.route)
                 }
             }
     }
@@ -37,8 +36,8 @@ class RegisterViewmodel : ViewModel() {
     }
 
     fun goToLogin(navController: NavHostController) {
-        navController.navigate(CodeQuestScreens.Login.route) {
-            popUpTo(CodeQuestScreens.Register.route) {
+        navController.navigate(Screens.UserCreationChild.Login.route) {
+            popUpTo(Screens.UserCreationChild.Register.route) {
                 inclusive = true
             }
         }

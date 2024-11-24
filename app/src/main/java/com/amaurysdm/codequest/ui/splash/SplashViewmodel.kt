@@ -2,7 +2,7 @@ package com.amaurysdm.codequest.ui.splash
 
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
-import com.amaurysdm.codequest.navigation.CodeQuestScreens
+import com.amaurysdm.codequest.navigation.Screens
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -25,13 +25,13 @@ class SplashViewmodel : ViewModel() {
         checkLoginJob.join()
 
         if (isLoggedIn) {
-            navController.navigate(CodeQuestScreens.General.route){
+            navController.navigate(Screens.General.route){
                 popUpTo(navController.graph.startDestinationId){
                     inclusive = true
                 }
             }
         } else {
-            navController.navigate(CodeQuestScreens.UserCreation.route){
+            navController.navigate(Screens.UserCreation.route){
                 popUpTo(navController.graph.startDestinationId){
                     inclusive = true
                 }

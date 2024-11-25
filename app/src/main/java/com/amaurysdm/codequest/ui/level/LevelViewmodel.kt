@@ -19,7 +19,6 @@ class LevelViewmodel : ViewModel() {
     private val level = LevelController.getLevel()
     private var levelText = level.route
     private var currentMovingDirectionIndex by mutableIntStateOf(0)
-    //private var currentPosition = levelText[currentMovingDirectionIndex]
 
     val uniqueDirection = levelText.toSet()
 
@@ -62,18 +61,6 @@ class LevelViewmodel : ViewModel() {
         return GameState(startingPosition, path)
     }
 
-    /*private fun moveDirection(chars : List<Char>): Pair<Int, Int> {
-        val moveDirection = when (chars[currentMovingDirectionIndex]) {
-            'u' -> Pair(0, -1)
-            'd' -> Pair(0, 1)
-            'r' -> Pair(1, 0)
-            'l' -> Pair(-1, 0)
-            else -> Pair(1, 1)
-        }
-        return moveDirection
-    }*/
-
-    // Stop this and try to create a list of paths first
     private fun moveDirection(
         chars: Char,
         repeatThis: Pair<Pair<Char, Char>, Int> = Pair(Pair('d', 'r'), 5)
@@ -94,16 +81,6 @@ class LevelViewmodel : ViewModel() {
         return moveDirection
     }
 
-    /*    private fun moveDirection(chars : Char, repeatThis: Pair<Pair<Char,Char>,Int> = Pair(Pair(' ',' '),0)): Pair<Int, Int> {
-    val moveDirection = when (chars) {
-    '/' -> Pair(moveDirection(repeatThis.first.first).first * repeatThis.second
-        + moveDirection(repeatThis.first.second).first * repeatThis.second
-    , moveDirection(repeatThis.first.first).second * repeatThis.second +
-            moveDirection(repeatThis.first.second).second * repeatThis.second)
-    else -> Pair(0, 0)
-    }
-    return moveDirection
-    }*/
 
     suspend fun movePlayer(chars: List<Char>, navController: NavHostController) {
 

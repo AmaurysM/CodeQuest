@@ -1,12 +1,5 @@
 package com.amaurysdm.codequest.ui.home
 
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.keyframes
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
@@ -25,10 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
@@ -44,7 +33,7 @@ import com.amaurysdm.codequest.TitleAnimation
 fun HomeView(
     navController: NavHostController = rememberNavController(),
     homeViewmodel: HomeViewmodel = viewModel()
-){
+) {
     val titleAnimation = TitleAnimation()
     Box(modifier = Modifier.fillMaxWidth()) {
         Image(
@@ -64,7 +53,9 @@ fun HomeView(
         ) {
 
             Column(
-                modifier = Modifier.fillMaxWidth().fillMaxHeight(0.8f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.8f),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -80,23 +71,34 @@ fun HomeView(
             }
 
             Row(
-                modifier = Modifier.fillMaxWidth().fillMaxHeight(0.8f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.8f),
                 horizontalArrangement = Arrangement.spacedBy(5.dp)
-            ){
+            ) {
                 Button(
                     onClick = { homeViewmodel.settings(navController) },
                     shape = MaterialTheme.shapes.small,
-                    modifier = Modifier.size(100.dp,100.dp)
+                    modifier = Modifier.size(100.dp, 100.dp)
                 ) {
-                    Icon(painter = painterResource(id = R.drawable.baseline_settings_24), contentDescription = "Settings Button")
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_settings_24),
+                        contentDescription = "Settings Button",
+                        modifier = Modifier.fillMaxSize()
+                    )
                 }
 
                 Button(
-                    onClick = {homeViewmodel.startGame(navController) },
+                    onClick = { homeViewmodel.startGame(navController) },
                     shape = MaterialTheme.shapes.small,
-                    modifier = Modifier.fillMaxWidth().size(100.dp,100.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .size(100.dp, 100.dp)
                 ) {
-                    Text(text = "Start Game")
+                    Text(
+                        text = "Start Game",
+                        fontSize = MaterialTheme.typography.headlineSmall.fontSize
+                    )
                 }
 
             }
@@ -104,8 +106,8 @@ fun HomeView(
             Button(
                 onClick = { homeViewmodel.logout(navController) },
                 shape = MaterialTheme.shapes.small,
-                modifier = Modifier.size(100.dp,100.dp)
-            ){Text(text = "Logout")}
+                modifier = Modifier.size(100.dp, 100.dp)
+            ) { Text(text = "Logout") }
 
         }
     }

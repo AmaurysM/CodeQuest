@@ -78,13 +78,13 @@ fun LevelSelectView(
                                 .padding(10.dp)
                                 .clip(MaterialTheme.shapes.medium)
                                 .border(15.dp, MaterialTheme.colorScheme.primary)
-                                .background(MaterialTheme.colorScheme.background)
+                                .background(if (levelSelectViewModel.getLevel(it).isCompleted) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.background)
                                 .clickable {
                                     levelSelectViewModel.navigateToLevel(navController, it)
                                 }
                         ) {
                             CreateText(
-                                text = it.toString(),
+                                text = (it + 1).toString(),
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 style = MaterialTheme.typography.headlineLarge,
                                 textSize = 80f,

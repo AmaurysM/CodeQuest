@@ -2,11 +2,16 @@ package com.amaurysdm.codequest.ui.levelselect
 
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
-import com.amaurysdm.codequest.model.levels.LevelController
+import com.amaurysdm.codequest.model.Level
+import com.amaurysdm.codequest.model.LevelController
 import com.amaurysdm.codequest.navigation.Screens
 
-class LevelSelectViewmodel: ViewModel() {
+class LevelSelectViewmodel : ViewModel() {
     val levels = LevelController.numberOfLevels()
+
+    fun getLevel(it: Int): Level {
+        return LevelController.getCertainLevel(it)
+    }
 
     fun navigateToLevel(navController: NavHostController, it: Int) {
         LevelController.setLevel(it)

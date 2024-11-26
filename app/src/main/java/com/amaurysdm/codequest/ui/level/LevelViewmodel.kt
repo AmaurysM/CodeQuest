@@ -6,9 +6,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
-import com.amaurysdm.codequest.R
+import com.amaurysdm.codequest.model.Directions
 import com.amaurysdm.codequest.model.GameState
 import com.amaurysdm.codequest.model.LevelController
+import com.amaurysdm.codequest.model.mapDirectionsList
 import com.amaurysdm.codequest.navigation.Screens
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -20,11 +21,15 @@ class LevelViewmodel : ViewModel() {
     private var levelText = level.route
     private var currentMovingDirectionIndex by mutableIntStateOf(0)
 
-    val uniqueDirection = levelText.toSet()
 
-    var currentState = createLevelFromText()
+
+    var currentState = createLevelFromText() // Has the path and start location
+
+    val uniqueDirection = currentState.path.toSet()//levelText.toSet()
+
     var positionX by mutableIntStateOf(currentState.playerPosition.first)
     var positionY by mutableIntStateOf(currentState.playerPosition.second)
+
     var isAnimating by mutableStateOf(false)
 
     fun countTurnsInLevel(): Int {
@@ -44,10 +49,12 @@ class LevelViewmodel : ViewModel() {
     private fun createLevelFromText(): GameState {
         val startingPosition = Pair(2, 5)
 
-        var currentPosition = startingPosition
-        val path = mutableListOf(currentPosition)
+        //var currentPosition = startingPosition
+        //val path = mutableListOf(currentPosition)
+        val path = mutableListOf<Directions>()
         levelText.forEach { value ->
-            currentPosition = when (value) {
+            //movementOptionsList.map {it.direction}.filter { it == value } .first()
+            /*currentPosition = when (value) {
                 'u' -> Pair(currentPosition.first, currentPosition.second - 1)
                 'd' -> Pair(currentPosition.first, currentPosition.second + 1)
                 'r' -> Pair(currentPosition.first + 1, currentPosition.second)
@@ -55,19 +62,19 @@ class LevelViewmodel : ViewModel() {
                 else -> {
                     Pair(currentPosition.first, currentPosition.second)
                 }
-            }
-            path.add(currentPosition)
+            }*/
+            path.add(mapDirectionsList.filter { it.direction == value } .first())
         }
         return GameState(startingPosition, path)
     }
 
     private fun moveDirection(
-        chars: Char,
-        repeatThis: Pair<Pair<Char, Char>, Int> = Pair(Pair('d', 'r'), 5)
+        chars: Directions,
+        //repeatThis: Pair<Pair<Char, Char>, Int> = Pair(Pair('d', 'r'), 5)
     ): List<Pair<Int, Int>> {
         val moveDirection = mutableListOf<Pair<Int, Int>>()
 
-        when (chars) {
+        when (chars.direction) {
             'u' -> moveDirection.add(Pair(0, -1))
             'd' -> moveDirection.add(Pair(0, 1))
             'r' -> moveDirection.add(Pair(1, 0))
@@ -82,10 +89,11 @@ class LevelViewmodel : ViewModel() {
     }
 
 
-    suspend fun movePlayer(chars: List<Char>, navController: NavHostController) {
+    suspend fun movePlayer(chars: ArrayList<Directions>, navController: NavHostController) {
+        var charsIterator = chars.iterator()
 
         fun isValidMove(x: Int, y: Int): Boolean {
-            return currentState.path
+            return currentState.path.map { it.movement }
                 .contains(
                     Pair(
                         x + moveDirection(chars[currentMovingDirectionIndex]).first().first,
@@ -104,8 +112,8 @@ class LevelViewmodel : ViewModel() {
             delay(150)
             val isValid = isValidMove(positionX, positionY)
 
-            if (positionX == currentState.path.last().first
-                && positionY == currentState.path.last().second
+            if (positionX == currentState.path.last().movement.first
+                && positionY == currentState.path.last().movement.second
             ) {
                 goToLevelSelect(navController)
                 level.isCompleted = true
@@ -120,11 +128,11 @@ class LevelViewmodel : ViewModel() {
                     currentMovingDirectionIndex++
                 }
                 if (currentMovingDirectionIndex == chars.size ||
-                    chars[currentMovingDirectionIndex] == ' '
+                    chars[currentMovingDirectionIndex] == Directions.Nothing
                 ) {
 
-                    positionX = currentState.path.first().first
-                    positionY = currentState.path.first().second
+                    positionX = currentState.path.first().movement.first
+                    positionY = currentState.path.first().movement.second
                     currentMovingDirectionIndex = 0
                     isAnimating = false
 
@@ -135,7 +143,7 @@ class LevelViewmodel : ViewModel() {
         isAnimating = false
     }
 
-    fun getImage(it: Char): Int {
+/*    fun getImage(it: Char): Int {
         return when (it) {
             'u' -> R.drawable.baseline_arrow_upward_24
             'd' -> R.drawable.baseline_arrow_downward_24
@@ -146,6 +154,6 @@ class LevelViewmodel : ViewModel() {
                 R.drawable.baseline_settings_24
             }
         }
-    }
+    }*/
 }
 

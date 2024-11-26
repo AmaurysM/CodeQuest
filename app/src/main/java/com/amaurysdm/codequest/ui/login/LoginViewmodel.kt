@@ -40,7 +40,7 @@ class LoginViewmodel : ViewModel() {
                 withContext(Dispatchers.Main) {
                     navController.navigate(Screens.GeneralChild.Home.route)
                 }
-            } catch (_: Exception){
+            } catch (_: Exception) {
 
             }
         }

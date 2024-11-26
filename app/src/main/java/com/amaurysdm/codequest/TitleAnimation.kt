@@ -9,7 +9,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.runtime.Composable
 
 @Composable
-fun TitleAnimation():Pair<Float, Float>{
+fun TitleAnimation(): Pair<Float, Float> {
     val infiniteTransition = rememberInfiniteTransition(label = "")
 
     val rotation = infiniteTransition.animateFloat(

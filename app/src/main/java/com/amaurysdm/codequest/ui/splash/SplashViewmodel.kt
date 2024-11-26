@@ -25,14 +25,14 @@ class SplashViewmodel : ViewModel() {
         checkLoginJob.join()
 
         if (isLoggedIn) {
-            navController.navigate(Screens.General.route){
-                popUpTo(navController.graph.startDestinationId){
+            navController.navigate(Screens.General.route) {
+                popUpTo(navController.graph.startDestinationId) {
                     inclusive = true
                 }
             }
         } else {
-            navController.navigate(Screens.UserCreation.route){
-                popUpTo(navController.graph.startDestinationId){
+            navController.navigate(Screens.UserCreation.route) {
+                popUpTo(navController.graph.startDestinationId) {
                     inclusive = true
                 }
             }

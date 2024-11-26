@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import com.amaurysdm.codequest.navigation.Screens
 
-class WelcomeViewmodel: ViewModel()  {
+class WelcomeViewmodel : ViewModel() {
 
     fun navigateLogin(navController: NavHostController) {
         navController.navigate(Screens.UserCreationChild.Login.route)

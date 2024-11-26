@@ -37,11 +37,11 @@ import kotlinx.coroutines.launch
 fun RegisterView(
     navController: NavHostController = rememberNavController(),
     registerViewmodel: RegisterViewmodel = viewModel()
-){
+) {
     val coroutineScope = rememberCoroutineScope()
     Box(
         modifier = Modifier.fillMaxSize()
-    ){
+    ) {
         Image(
             bitmap = ImageBitmap.imageResource(id = R.drawable.grass_background),
             contentDescription = "background",
@@ -54,70 +54,80 @@ fun RegisterView(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
-        ){
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp)
-                    .shadow(100.dp
-                        , MaterialTheme.shapes.medium
-                        , spotColor = Color.Black
-                        , ambientColor = Color.Black
+                    .shadow(
+                        100.dp,
+                        MaterialTheme.shapes.medium,
+                        spotColor = Color.Black,
+                        ambientColor = Color.Black
                     )
                     .clip(MaterialTheme.shapes.medium)
                     .background(MaterialTheme.colorScheme.surface)
-                    .padding(top = 5.dp, bottom = 10.dp, start = 10.dp, end = 10.dp)
-                ,
-                horizontalAlignment = Alignment.CenterHorizontally
-                , verticalArrangement = Arrangement.spacedBy(5.dp)
+                    .padding(top = 5.dp, bottom = 10.dp, start = 10.dp, end = 10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
 
                 OutlinedTextField(
                     value = registerViewmodel.registerData.email,
-                    onValueChange = { registerViewmodel.registerData = registerViewmodel.registerData.copy(email = it) },
+                    onValueChange = {
+                        registerViewmodel.registerData =
+                            registerViewmodel.registerData.copy(email = it)
+                    },
                     label = { Text("Email") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 OutlinedTextField(
                     value = registerViewmodel.registerData.password,
-                    onValueChange = { registerViewmodel.registerData = registerViewmodel.registerData.copy(password = it) },
+                    onValueChange = {
+                        registerViewmodel.registerData =
+                            registerViewmodel.registerData.copy(password = it)
+                    },
                     label = { Text("Password") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 OutlinedTextField(
                     value = registerViewmodel.registerData.confirmPassword,
-                    onValueChange = { registerViewmodel.registerData = registerViewmodel.registerData.copy(confirmPassword = it) },
+                    onValueChange = {
+                        registerViewmodel.registerData =
+                            registerViewmodel.registerData.copy(confirmPassword = it)
+                    },
                     label = { Text("Confirm Password") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 Row(
-                    modifier = Modifier.fillMaxWidth()
-                    , horizontalArrangement = Arrangement.spacedBy(5.dp)
-                ){
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(5.dp)
+                ) {
                     Button(
                         onClick = {
-                            coroutineScope.launch{
+                            coroutineScope.launch {
                                 registerViewmodel.goBack(navController)
                             }
                         },
                         shape = MaterialTheme.shapes.small,
 
                         ) {
-                        Icon(painter = painterResource(id = R.drawable.baseline_arrow_back_24), contentDescription = "Back Button")
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_arrow_back_24),
+                            contentDescription = "Back Button"
+                        )
                     }
 
                     Button(
                         onClick = {
-                            coroutineScope.launch{
+                            coroutineScope.launch {
                                 registerViewmodel.register(navController)
                             }
 
-                        }
-                        , shape = MaterialTheme.shapes.small
-                        , modifier = Modifier.fillMaxWidth()
+                        }, shape = MaterialTheme.shapes.small, modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(text = "Register")
                     }
@@ -128,7 +138,7 @@ fun RegisterView(
                         registerViewmodel.goToLogin(navController)
                     }
 
-                ){
+                ) {
                     Text(text = "Don't have an account? ")
                     Text(text = "Login", color = MaterialTheme.colorScheme.primary)
                 }

@@ -62,6 +62,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.amaurysdm.codequest.CreateText
 import com.amaurysdm.codequest.R
+import com.amaurysdm.codequest.model.Directions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -75,11 +76,11 @@ fun LevelView(
 ) {
     var tileSize by remember { mutableStateOf(0.dp) }
     val coroutineScope = rememberCoroutineScope()
-    var dragBoxItem = remember { CharArray(1) }
+    var dragBoxItem by remember { /*CharArray(1) */ mutableStateOf<Directions>(Directions.Down)}
     var boxes = remember {
-        ArrayList<Char>(levelViewModel.countTurnsInLevel())
+        ArrayList<Directions>(levelViewModel.countTurnsInLevel())
             .apply {
-                repeat(levelViewModel.countTurnsInLevel()) { add(' ') }
+                repeat(levelViewModel.countTurnsInLevel()) { add(Directions.Nothing) }
             }
     }
 
@@ -114,7 +115,7 @@ fun LevelView(
                             .requiredSize(100.dp)
                     ) {
                         Icon(imageVector = ImageVector
-                            .vectorResource(id = levelViewModel.getImage(it)),
+                            .vectorResource(id = /*levelViewModel.getImage(it)*/ it.icon),
                             contentDescription = null,
                             modifier = Modifier
                                 .align(Alignment.Center)
@@ -122,7 +123,7 @@ fun LevelView(
                                 .dragAndDropSource {
                                     detectTapGestures(
                                         onLongPress = { offset ->
-                                            dragBoxItem[0] = it
+                                            dragBoxItem = it
                                             startTransfer(
                                                 transferData = DragAndDropTransferData(
                                                     clipData = ClipData.newPlainText(
@@ -197,7 +198,7 @@ fun LevelView(
                                         override fun onDrop(event: DragAndDropEvent): Boolean {
                                             Log.i("DragAndDrop", "onDrop")
                                             droped = true
-                                            boxes[index] = dragBoxItem[0]
+                                            boxes[index] = dragBoxItem
                                             return true
                                         }
                                     }
@@ -212,16 +213,16 @@ fun LevelView(
                         ) {
                             Icon(
                                 imageVector = ImageVector.vectorResource(
-                                    id = levelViewModel.getImage(
+                                    id = boxes[index].icon/*levelViewModel.getImage(
                                         boxes[index]
-                                    )
+                                    )*/
                                 ), contentDescription = null, modifier = Modifier
                                     .fillMaxSize()
                                     .dragAndDropSource {
                                         detectTapGestures(
                                             onLongPress = { offset ->
                                                 droped = false
-                                                dragBoxItem[0] = boxes[index]
+                                                dragBoxItem = boxes[index]
                                                 startTransfer(
                                                     transferData = DragAndDropTransferData(
                                                         clipData = ClipData.newPlainText(
@@ -278,7 +279,7 @@ fun LevelView(
                 levelViewModel.currentState.path.forEach {
                     Box(
                         modifier = Modifier
-                            .offset(tileSize * it.first, tileSize * it.second)
+                            .offset(tileSize * it.movement.first, tileSize * it.movement.second)
                             .size(tileSize)
                             .background(Color.Red)
                     )
@@ -297,8 +298,8 @@ fun LevelView(
                 Box(
                     modifier = Modifier
                         .offset(
-                            tileSize * levelViewModel.currentState.path.last().first,
-                            tileSize * levelViewModel.currentState.path.last().second
+                            tileSize * levelViewModel.currentState.path.last().movement.first,
+                            tileSize * levelViewModel.currentState.path.last().movement.second
                         )
                         .size(tileSize)
                         .background(Color.Yellow)

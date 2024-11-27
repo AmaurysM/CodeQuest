@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.crashlytics.buildtools)
     implementation(libs.androidx.ui.text.google.fonts)
+    implementation(libs.androidx.room.ktx)
 
     testImplementation(libs.junit)
 

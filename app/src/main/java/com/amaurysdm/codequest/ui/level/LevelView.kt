@@ -3,7 +3,6 @@ package com.amaurysdm.codequest.ui.level
 import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipDescription
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -37,11 +36,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draganddrop.DragAndDropEvent
@@ -49,6 +47,7 @@ import androidx.compose.ui.draganddrop.DragAndDropTarget
 import androidx.compose.ui.draganddrop.DragAndDropTransferData
 import androidx.compose.ui.draganddrop.mimeTypes
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -66,6 +65,7 @@ import com.amaurysdm.codequest.model.Directions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+
 @OptIn(ExperimentalFoundationApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -74,19 +74,7 @@ fun LevelView(
     navController: NavHostController = rememberNavController(),
     levelViewModel: LevelViewmodel = viewModel()
 ) {
-    var tileSize by remember { mutableStateOf(0.dp) }
     val coroutineScope = rememberCoroutineScope()
-    var dragBoxItem by remember { /*CharArray(1) */ mutableStateOf<Directions>(Directions.Down)}
-    var boxes = remember {
-        ArrayList<Directions>(levelViewModel.countTurnsInLevel())
-            .apply {
-                repeat(levelViewModel.countTurnsInLevel()) { add(Directions.Nothing) }
-            }
-    }
-
-    //var pannableScreenStartPosition by remember { mutableStateOf(Pair(0f, 0f)) }
-    var pannableScreenOffsetX by remember { mutableStateOf(0f) }
-    var pannableScreenOffsetY by remember { mutableStateOf(0f) }
 
     Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
         Row(
@@ -107,7 +95,7 @@ fun LevelView(
                         flingBehavior = null,
                     )
             ) {
-                levelViewModel.uniqueDirection.forEach { it ->
+                levelViewModel.bottomBarItems.forEach { direction ->
                     Box(
                         modifier = Modifier
                             .size(100.dp)
@@ -115,15 +103,18 @@ fun LevelView(
                             .requiredSize(100.dp)
                     ) {
                         Icon(imageVector = ImageVector
-                            .vectorResource(id = /*levelViewModel.getImage(it)*/ it.icon),
+                            .vectorResource(id = direction.icon),
                             contentDescription = null,
                             modifier = Modifier
                                 .align(Alignment.Center)
                                 .fillMaxSize()
                                 .dragAndDropSource {
                                     detectTapGestures(
-                                        onLongPress = { offset ->
-                                            dragBoxItem = it
+                                        onLongPress = { _ ->
+                                            levelViewModel.draggingItem = TopBarItem(
+                                                mutableStateOf(direction),
+                                                mutableStateOf(true)
+                                            )
                                             startTransfer(
                                                 transferData = DragAndDropTransferData(
                                                     clipData = ClipData.newPlainText(
@@ -135,6 +126,7 @@ fun LevelView(
                                         }
                                     )
                                 }
+
                         )
                     }
                 }
@@ -149,109 +141,124 @@ fun LevelView(
                     .clickable(
                         enabled = !levelViewModel.isAnimating
                     ) {
-                        coroutineScope.launch(Dispatchers.IO) {
-                            levelViewModel.movePlayer(boxes, navController)
-                        }
-                        pannableScreenOffsetX = 0f
-                        pannableScreenOffsetY = 0f
                         levelViewModel.isAnimating = true
+                        coroutineScope.launch(Dispatchers.IO) {
+                            levelViewModel.playButton(navController)
+                        }
                     }
+
             ) {
                 CreateText("GO", modifier = Modifier.align(Alignment.Center))
             }
         }
     }, topBar = {
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.15f)
                 .background(MaterialTheme.colorScheme.secondary)
-                .padding(10.dp), horizontalArrangement = Arrangement.SpaceBetween
+                .padding(10.dp)
+                .horizontalScroll(
+                    state = rememberScrollState(),
+                    enabled = true,
+                    flingBehavior = null,
+                )
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-                    .horizontalScroll(
-                        state = rememberScrollState(),
-                        enabled = true,
-                        flingBehavior = null,
-                    )
-            ) {
-                repeat(boxes.size) { index ->
-                    var droped by remember { mutableStateOf(false) }
-                    Box(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .padding(10.dp)
-                            .background(MaterialTheme.colorScheme.primary)
-                            .border(BorderStroke(1.dp, Color.Black))
-                            .dragAndDropTarget(
-                                shouldStartDragAndDrop = { event ->
-                                    event
-                                        .mimeTypes()
-                                        .contains(ClipDescription.MIMETYPE_TEXT_PLAIN)
-                                },
-                                target = remember {
-                                    object : DragAndDropTarget {
-                                        override fun onDrop(event: DragAndDropEvent): Boolean {
-                                            Log.i("DragAndDrop", "onDrop")
-                                            droped = true
-                                            boxes[index] = dragBoxItem
-                                            return true
-                                        }
+
+            levelViewModel.topBarItems.forEachIndexed { index, _ ->
+
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .padding(10.dp)
+                        .background(MaterialTheme.colorScheme.primary)
+                        .border(BorderStroke(1.dp, Color.Black))
+                        .dragAndDropTarget(
+                            shouldStartDragAndDrop = { event ->
+                                event
+                                    .mimeTypes()
+                                    .contains(ClipDescription.MIMETYPE_TEXT_PLAIN)
+                            },
+                            target = remember {
+                                object : DragAndDropTarget {
+                                    override fun onDrop(event: DragAndDropEvent): Boolean {
+
+                                        levelViewModel.topBarItems[index] =
+                                            levelViewModel.draggingItem
+                                        levelViewModel.draggingItem = TopBarItem()
+
+                                        if (levelViewModel.clickedItem == levelViewModel.topBarItems[index]) {
+                                            levelViewModel.clickedItem = TopBarItem()
+                                        } else levelViewModel.clickedItem =
+                                            levelViewModel.topBarItems[index]
+
+
+                                        return true
                                     }
                                 }
-                            ),
-                    )
-                    {
-                        this@Row.AnimatedVisibility(
-                            visible = droped,
-                            enter = scaleIn() + fadeIn(),
-                            exit = scaleOut() + fadeOut()
-                        ) {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(
-                                    id = boxes[index].icon/*levelViewModel.getImage(
-                                        boxes[index]
-                                    )*/
-                                ), contentDescription = null, modifier = Modifier
-                                    .fillMaxSize()
-                                    .dragAndDropSource {
-                                        detectTapGestures(
-                                            onLongPress = { offset ->
-                                                droped = false
-                                                dragBoxItem = boxes[index]
-                                                startTransfer(
-                                                    transferData = DragAndDropTransferData(
-                                                        clipData = ClipData.newPlainText(
-                                                            "text",
-                                                            ""
-                                                        )
+                            }
+                        )
+
+                )
+                {
+
+                    this@Row.AnimatedVisibility(
+                        visible = levelViewModel.topBarItems[index].isVisible.value,
+                        enter = scaleIn() + fadeIn(),
+                        exit = scaleOut() + fadeOut()
+                    ) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(
+                                id = levelViewModel.topBarItems[index].direction.value.icon
+                            ), contentDescription = null, modifier = Modifier
+                                .fillMaxSize()
+                                .dragAndDropSource {
+                                    detectTapGestures(
+                                        onLongPress = { _ ->
+
+                                            levelViewModel.draggingItem =
+                                                levelViewModel.topBarItems[index]
+                                            levelViewModel.topBarItems[index] = TopBarItem()
+
+                                            startTransfer(
+                                                transferData = DragAndDropTransferData(
+                                                    clipData = ClipData.newPlainText(
+                                                        "text",
+                                                        ""
                                                     )
                                                 )
-                                            }
-                                        )
+                                            )
+                                        },
+                                        onTap = {
+                                            if (levelViewModel.clickedItem == levelViewModel.topBarItems[index]) {
+                                                levelViewModel.clickedItem = TopBarItem()
+                                            } else levelViewModel.clickedItem =
+                                                levelViewModel.topBarItems[index]
+                                        }
+                                    )
+                                }
 
-                                    }
-                            )
-                        }
+                        )
                     }
                 }
             }
         }
     }
-    ) {
+    ) { paddingValues ->
         Box(
-            modifier = Modifier
+            modifier = modifier
+                .padding(vertical = paddingValues.calculateTopPadding() - 25.dp)
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
                         change.consume()
-                        pannableScreenOffsetX += dragAmount.x
-                        pannableScreenOffsetY += dragAmount.y
+                        levelViewModel.screenPosition = Offset(
+                            levelViewModel.screenPosition.x + dragAmount.x,
+                            levelViewModel.screenPosition.y + dragAmount.y
+                        )
                     }
                 }
+
         )
         {
             Image(
@@ -262,50 +269,153 @@ fun LevelView(
                 contentScale = ContentScale.FillHeight
             )
 
+            AnimatedVisibility(
+                visible = levelViewModel.clickedItem.direction.value == Directions.Repeat,
+                enter = scaleIn() + fadeIn(),
+                exit = scaleOut() + fadeOut()
+            ) {
+
+                if (levelViewModel.clickedItem.children.isEmpty()) {
+                    levelViewModel.clickedItem.children =
+                        remember { mutableStateListOf(TopBarItem(), TopBarItem()) }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .background(Color.Red)
+                            .align(Alignment.TopEnd)
+                    ) {
+
+                        levelViewModel.clickedItem.children.forEachIndexed { index, _ ->
+
+                            Box(
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .padding(10.dp)
+                                    .background(MaterialTheme.colorScheme.primary)
+                                    .border(BorderStroke(1.dp, Color.Black))
+                                    .dragAndDropTarget(
+                                        shouldStartDragAndDrop = { event ->
+                                            event
+                                                .mimeTypes()
+                                                .contains(ClipDescription.MIMETYPE_TEXT_PLAIN)
+                                        },
+                                        target = remember {
+                                            object : DragAndDropTarget {
+                                                override fun onDrop(event: DragAndDropEvent): Boolean {
+                                                    levelViewModel.clickedItem.children[index] =
+                                                        levelViewModel.draggingItem
+                                                    levelViewModel.draggingItem = TopBarItem()
+
+                                                    return true
+                                                }
+                                            }
+                                        }
+                                    ),
+                            )
+                            {
+                                this@Row.AnimatedVisibility(
+                                    visible = levelViewModel.clickedItem.children[index].isVisible.value,
+                                    enter = scaleIn() + fadeIn(),
+                                    exit = scaleOut() + fadeOut()
+                                ) {
+                                    Icon(
+                                        imageVector = ImageVector.vectorResource(
+                                            id = levelViewModel.clickedItem.children[index].direction.value.icon
+                                        ),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .dragAndDropSource {
+                                                detectTapGestures(
+                                                    onLongPress = { _ ->
+
+                                                        levelViewModel.draggingItem =
+                                                            levelViewModel.clickedItem.children[index]
+                                                        levelViewModel.clickedItem.children[index] =
+                                                            TopBarItem()
+
+                                                        startTransfer(
+                                                            transferData = DragAndDropTransferData(
+                                                                clipData = ClipData.newPlainText(
+                                                                    "text",
+                                                                    ""
+                                                                )
+                                                            )
+                                                        )
+                                                    },
+                                                    onTap = {
+                                                        if (levelViewModel.clickedItem == levelViewModel.topBarItems[index]) {
+                                                            levelViewModel.clickedItem =
+                                                                TopBarItem()
+                                                        } else levelViewModel.clickedItem =
+                                                            levelViewModel.topBarItems[index]
+                                                    }
+                                                )
+                                            },
+
+                                        )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             BoxWithConstraints(
                 modifier
                     .fillMaxWidth()
                     .fillMaxHeight(0.9f)
-                    .padding(10.dp)
                     .offset(
-                        x = pannableScreenOffsetX.dp / 3.5f,
-                        y = pannableScreenOffsetY.dp / 3.5f
+                        x = levelViewModel.screenPosition.x.dp,
+                        y = levelViewModel.screenPosition.y.dp
                     )
 
 
             ) {
-                tileSize = maxWidth / 10
-                levelViewModel.currentState.path.forEach {
+
+
+                // Create Path
+                val tileSize = remember(maxWidth) { maxWidth / 10 }
+
+                levelViewModel.gameState.path.forEach { direction ->
+
                     Box(
                         modifier = Modifier
-                            .offset(tileSize * it.movement.first, tileSize * it.movement.second)
+                            .offset(x = tileSize * direction.first, y = tileSize * direction.second)
                             .size(tileSize)
                             .background(Color.Red)
                     )
                 }
 
-
+                // Create End Square
                 Box(
                     modifier = Modifier
                         .offset(
-                            x = tileSize * levelViewModel.positionX,
-                            y = tileSize * levelViewModel.positionY
-                        )
-                        .size(tileSize)
-                        .background(Color.Blue)
-                )
-                Box(
-                    modifier = Modifier
-                        .offset(
-                            tileSize * levelViewModel.currentState.path.last().movement.first,
-                            tileSize * levelViewModel.currentState.path.last().movement.second
+                            tileSize * levelViewModel.gameState.path.last().first,
+                            tileSize * levelViewModel.gameState.path.last().second
                         )
                         .size(tileSize)
                         .background(Color.Yellow)
                 )
-            }
 
+                // Create Player
+                Box(
+                    modifier = Modifier
+                        .offset(
+                            x = tileSize * levelViewModel.gameState.playerPosition.first,
+                            y = tileSize * levelViewModel.gameState.playerPosition.second
+                        )
+                        .size(tileSize)
+                        .background(Color.Blue)
+                )
+            }
         }
     }
 }

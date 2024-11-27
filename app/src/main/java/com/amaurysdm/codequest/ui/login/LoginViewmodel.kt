@@ -18,7 +18,6 @@ import kotlinx.coroutines.withContext
 
 class LoginViewmodel : ViewModel() {
     var loginData by mutableStateOf(LoginData())
-    var correct by mutableStateOf(true)
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private var loginJob = CoroutineScope(Dispatchers.IO + SupervisorJob())

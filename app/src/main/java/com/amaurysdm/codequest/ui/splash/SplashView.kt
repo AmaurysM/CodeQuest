@@ -47,9 +47,9 @@ fun SplashView(
         animationSpec = infiniteRepeatable(
             animation = keyframes {
                 durationMillis = 1000
-                -15f at 0 with FastOutLinearInEasing
-                15f at 500 with LinearOutSlowInEasing
-                -15f at 1000 with FastOutLinearInEasing
+                -15f at 0 using FastOutLinearInEasing
+                15f at 500 using LinearOutSlowInEasing
+                -15f at 1000 using FastOutLinearInEasing
             }, repeatMode = RepeatMode.Reverse
         )
     )

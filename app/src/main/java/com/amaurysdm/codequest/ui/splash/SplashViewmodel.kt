@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 
 class SplashViewmodel : ViewModel() {
 
-    val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
+    private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
 
     suspend fun navigateIfLogged(navController: NavHostController) {
 

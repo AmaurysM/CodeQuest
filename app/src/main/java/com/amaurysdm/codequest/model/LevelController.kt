@@ -4,13 +4,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 
-data class Level(val name: String, val route: String, var isCompleted: Boolean = false)
 object LevelController {
 
-    var currentLevel by mutableIntStateOf(0)
+    private var currentLevel by mutableIntStateOf(0)
 
     private val levels = listOf<Level>(
-        Level("Level 1", "rrdrd/", false),
+        Level("Level 1", "rrdrd", false),
         Level("Level 2", "ddrrddllu", false),
         Level("Level 3", "ddddddrrrruuulld", false),
         Level("Level 4", "rrddrrddrrddrrddrrddrrdd/", false)

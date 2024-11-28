@@ -12,6 +12,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import com.amaurysdm.codequest.model.Directions
+import com.amaurysdm.codequest.model.FireBaseController
 import com.amaurysdm.codequest.model.GameState
 import com.amaurysdm.codequest.model.LevelController
 import com.amaurysdm.codequest.model.movableDirections
@@ -84,10 +85,10 @@ class LevelViewmodel : ViewModel() {
 
     private fun numberOfTurns(): Int {
         if (LevelController.getLevel().route.isEmpty()) {
-            return 0
+            return 1
         }
 
-        var changes = 0
+        var changes = 1
         for (i in 1 until LevelController.getLevel().route.length) {
             if (LevelController.getLevel().route[i] != LevelController.getLevel().route[i - 1]) {
                 changes++
@@ -147,8 +148,6 @@ class LevelViewmodel : ViewModel() {
             delay(150)
             if (chosenDirection.isEmpty()) break
 
-
-
             if (currentMove == chosenDirection.size) {
                 break
             }
@@ -163,13 +162,14 @@ class LevelViewmodel : ViewModel() {
             } else {
                 currentMove++
                 if (gameState.playerPosition == gameState.path.last()) {
+                    Log.w("LevelViewmodel", "Level completed")
                     withContext(Dispatchers.Main) {
                         launch {
                             navController.navigate(Screens.GameChild.LevelSelect.route)
                             LevelController.getLevel().isCompleted = true
+                            FireBaseController.saveLevels()
                         }
                     }
-                    //delay(300)
                     break
                 }
             }

@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.amaurysdm.codequest.CreateText
+import com.amaurysdm.codequest.customcomposables.CreateText
 import com.amaurysdm.codequest.R
 
 @Preview(showBackground = true)

@@ -1,4 +1,4 @@
-package com.amaurysdm.codequest
+package com.amaurysdm.codequest.customcomposables
 
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing

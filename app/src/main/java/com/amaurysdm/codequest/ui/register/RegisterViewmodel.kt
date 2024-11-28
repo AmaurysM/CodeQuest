@@ -5,9 +5,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
+import com.amaurysdm.codequest.model.FireBaseController
 import com.amaurysdm.codequest.model.RegisterData
 import com.amaurysdm.codequest.navigation.Screens
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.cancel
 
 class RegisterViewmodel : ViewModel() {
     var registerData by mutableStateOf(RegisterData())
@@ -23,16 +25,17 @@ class RegisterViewmodel : ViewModel() {
             return
         }
 
-        auth.createUserWithEmailAndPassword(registerData.email, registerData.password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    navController.navigate(Screens.UserCreationChild.Login.route)
-                }
-            }
+        FireBaseController.register(registerData
+            , onRegister = {
+            navController.navigate(Screens.UserCreationChild.Login.route)
+        })
+
+
     }
 
     fun goBack(navController: NavHostController) {
         navController.popBackStack()
+        FireBaseController.registerJob.cancel()
     }
 
     fun goToLogin(navController: NavHostController) {

@@ -27,6 +27,10 @@ object LevelController {
         return levels.size
     }
 
+    fun getAllLevels(): List<Level> {
+        return levels
+    }
+
     fun nextLevel() {
         currentLevel++
     }

@@ -71,6 +71,15 @@ fun RegisterView(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
+                OutlinedTextField(
+                    value = registerViewmodel.registerData.username,
+                    onValueChange = {
+                        registerViewmodel.registerData =
+                            registerViewmodel.registerData.copy(username = it)
+                    },
+                    label = { Text("Username") },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
                 OutlinedTextField(
                     value = registerViewmodel.registerData.email,

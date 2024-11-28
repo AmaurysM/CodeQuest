@@ -11,8 +11,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class HomeViewmodel : ViewModel() {
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    private var loginJob = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     fun startGame(navController: NavHostController) {
         navController.navigate(Screens.GameChild.LevelSelect.route)
@@ -20,23 +18,5 @@ class HomeViewmodel : ViewModel() {
 
     fun settings(navController: NavHostController) {
         navController.navigate(Screens.GeneralChild.Settings.route)
-    }
-
-    fun logout(navController: NavHostController) {
-        loginJob.launch {
-            try {
-                auth.signOut()
-
-                withContext(Dispatchers.Main) {
-                    navController.navigate(Screens.UserCreationChild.Welcome.route) {
-                        popUpTo(navController.graph.id) {
-                            inclusive = true
-                        }
-                    }
-                }
-            } catch (_: Exception) {
-
-            }
-        }
     }
 }

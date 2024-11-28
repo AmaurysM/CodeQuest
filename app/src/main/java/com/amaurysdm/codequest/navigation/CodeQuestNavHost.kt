@@ -13,6 +13,7 @@ import com.amaurysdm.codequest.ui.level.LevelView
 import com.amaurysdm.codequest.ui.levelselect.LevelSelectView
 import com.amaurysdm.codequest.ui.login.LoginView
 import com.amaurysdm.codequest.ui.register.RegisterView
+import com.amaurysdm.codequest.ui.settings.SettingsView
 import com.amaurysdm.codequest.ui.splash.SplashView
 import com.amaurysdm.codequest.ui.welcome.WelcomeView
 
@@ -60,6 +61,7 @@ fun CodeQuestNavHost(
             }
 
             composable(route = Screens.GeneralChild.Settings.route) {
+                SettingsView(navController = navController)
             }
 
             navigation(

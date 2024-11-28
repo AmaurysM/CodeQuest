@@ -25,9 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.amaurysdm.codequest.CreateText
+import com.amaurysdm.codequest.customcomposables.CreateText
 import com.amaurysdm.codequest.R
-import com.amaurysdm.codequest.TitleAnimation
+import com.amaurysdm.codequest.customcomposables.TitleAnimation
 
 @Composable
 fun HomeView(
@@ -102,12 +102,6 @@ fun HomeView(
                 }
 
             }
-
-            Button(
-                onClick = { homeViewmodel.logout(navController) },
-                shape = MaterialTheme.shapes.small,
-                modifier = Modifier.size(100.dp, 100.dp)
-            ) { Text(text = "Logout") }
 
         }
     }

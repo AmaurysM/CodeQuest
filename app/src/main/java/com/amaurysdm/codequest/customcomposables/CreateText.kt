@@ -1,4 +1,4 @@
-package com.amaurysdm.codequest
+package com.amaurysdm.codequest.customcomposables
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.offset

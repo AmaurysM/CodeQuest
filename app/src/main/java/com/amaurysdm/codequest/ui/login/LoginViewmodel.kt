@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
+import com.amaurysdm.codequest.model.FireBaseController
 import com.amaurysdm.codequest.model.LoginData
 import com.amaurysdm.codequest.navigation.Screens
 import com.google.firebase.auth.FirebaseAuth
@@ -19,30 +20,27 @@ import kotlinx.coroutines.withContext
 class LoginViewmodel : ViewModel() {
     var loginData by mutableStateOf(LoginData())
 
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    private var loginJob = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    fun saveUser(){
+
+        FireBaseController.saveLevels()
+    }
 
     fun goBack(navController: NavHostController) {
         navController.popBackStack()
-        loginJob.cancel()
+        FireBaseController.loginJob.cancel()
     }
 
     fun login(navController: NavHostController) {
-        loginJob.launch {
-            if (loginData.email.isEmpty() || loginData.password.isEmpty()) {
-                return@launch
-            }
-
-            try {
-                auth.signInWithEmailAndPassword(loginData.email, loginData.password).await()
-
-                withContext(Dispatchers.Main) {
-                    navController.navigate(Screens.GeneralChild.Home.route)
-                }
-            } catch (_: Exception) {
-
-            }
+        if (loginData.email.isEmpty() || loginData.password.isEmpty()) {
+            return
         }
+        FireBaseController.login(loginData, {
+            navController.navigate(Screens.General.route) {
+                popUpTo(Screens.UserCreationChild.Login.route) {
+                    inclusive = true
+                }
+            }
+        })
     }
 
     fun goToRegister(navController: NavHostController) {

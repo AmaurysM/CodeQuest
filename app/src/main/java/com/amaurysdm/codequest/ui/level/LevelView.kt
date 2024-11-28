@@ -61,6 +61,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.amaurysdm.codequest.CreateText
 import com.amaurysdm.codequest.R
+import com.amaurysdm.codequest.customcomposables.UpDownKeys
 import com.amaurysdm.codequest.model.Directions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -193,7 +194,6 @@ fun LevelView(
                                         } else levelViewModel.clickedItem =
                                             levelViewModel.topBarItems[index]
 
-
                                         return true
                                     }
                                 }
@@ -269,6 +269,53 @@ fun LevelView(
                 contentScale = ContentScale.FillHeight
             )
 
+            BoxWithConstraints(
+                modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.9f)
+                    .offset(
+                        x = levelViewModel.screenPosition.x.dp/5,
+                        y = levelViewModel.screenPosition.y.dp/5
+                    )
+
+            ) {
+
+                // Create Path
+                val tileSize = remember(maxWidth) { maxWidth / 10 }
+
+                levelViewModel.gameState.path.forEach { direction ->
+
+                    Box(
+                        modifier = Modifier
+                            .offset(x = tileSize * direction.first, y = tileSize * direction.second)
+                            .size(tileSize)
+                            .background(Color.Red)
+                    )
+                }
+
+                // Create End Square
+                Box(
+                    modifier = Modifier
+                        .offset(
+                            tileSize * levelViewModel.gameState.path.last().first,
+                            tileSize * levelViewModel.gameState.path.last().second
+                        )
+                        .size(tileSize)
+                        .background(Color.Yellow)
+                )
+
+                // Create Player
+                Box(
+                    modifier = Modifier
+                        .offset(
+                            x = tileSize * levelViewModel.gameState.playerPosition.first,
+                            y = tileSize * levelViewModel.gameState.playerPosition.second
+                        )
+                        .size(tileSize)
+                        .background(Color.Blue)
+                )
+            }
+
             AnimatedVisibility(
                 visible = levelViewModel.clickedItem.direction.value == Directions.Repeat,
                 enter = scaleIn() + fadeIn(),
@@ -288,7 +335,9 @@ fun LevelView(
                     Row(
                         modifier = Modifier
                             .background(Color.Red)
-                            .align(Alignment.TopEnd)
+                            .align(Alignment.TopEnd),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
 
                         levelViewModel.clickedItem.children.forEachIndexed { index, _ ->
@@ -296,8 +345,8 @@ fun LevelView(
                             Box(
                                 modifier = Modifier
                                     .size(100.dp)
-                                    .clip(RoundedCornerShape(10.dp))
                                     .padding(10.dp)
+                                    .clip(RoundedCornerShape(10.dp))
                                     .background(MaterialTheme.colorScheme.primary)
                                     .border(BorderStroke(1.dp, Color.Black))
                                     .dragAndDropTarget(
@@ -364,57 +413,12 @@ fun LevelView(
                                 }
                             }
                         }
+                        UpDownKeys(
+                            modifier = Modifier,
+                            initialNumber = levelViewModel.clickedItem.repeater
+                        )
                     }
                 }
-            }
-
-            BoxWithConstraints(
-                modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.9f)
-                    .offset(
-                        x = levelViewModel.screenPosition.x.dp,
-                        y = levelViewModel.screenPosition.y.dp
-                    )
-
-
-            ) {
-
-
-                // Create Path
-                val tileSize = remember(maxWidth) { maxWidth / 10 }
-
-                levelViewModel.gameState.path.forEach { direction ->
-
-                    Box(
-                        modifier = Modifier
-                            .offset(x = tileSize * direction.first, y = tileSize * direction.second)
-                            .size(tileSize)
-                            .background(Color.Red)
-                    )
-                }
-
-                // Create End Square
-                Box(
-                    modifier = Modifier
-                        .offset(
-                            tileSize * levelViewModel.gameState.path.last().first,
-                            tileSize * levelViewModel.gameState.path.last().second
-                        )
-                        .size(tileSize)
-                        .background(Color.Yellow)
-                )
-
-                // Create Player
-                Box(
-                    modifier = Modifier
-                        .offset(
-                            x = tileSize * levelViewModel.gameState.playerPosition.first,
-                            y = tileSize * levelViewModel.gameState.playerPosition.second
-                        )
-                        .size(tileSize)
-                        .background(Color.Blue)
-                )
             }
         }
     }

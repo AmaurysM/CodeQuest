@@ -1,6 +1,7 @@
 package com.amaurysdm.codequest.ui.level
 
 import android.util.Log
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -23,12 +24,15 @@ import kotlinx.coroutines.withContext
 data class TopBarItem(
     var direction: MutableState<Directions> = mutableStateOf(Directions.Nothing),
     var isVisible: MutableState<Boolean> = mutableStateOf(false),
-    var children: MutableList<TopBarItem> = mutableStateListOf()
+    var children: MutableList<TopBarItem> = mutableStateListOf(),
+    var repeater: MutableIntState = mutableIntStateOf(1)
 )
 
 class LevelViewmodel : ViewModel() {
 
-    var gameState by mutableStateOf(GameState(Pair(0, 0), mutableListOf<Pair<Int, Int>>()))
+    private var startLocation by mutableStateOf(Pair(2, 4))
+
+    var gameState by mutableStateOf(GameState(startLocation, mutableListOf<Pair<Int, Int>>()))
     private var uniqueDirectionInGameState = setOf<Directions>()
     var draggingItem by mutableStateOf<TopBarItem>(TopBarItem())
     var clickedItem by mutableStateOf<TopBarItem>(TopBarItem())
@@ -43,7 +47,7 @@ class LevelViewmodel : ViewModel() {
 
 
     init {
-        gameState = GameState(Pair(0, 0), createPathCoordinates())
+        gameState = GameState(startLocation, createPathCoordinates())
         uniqueDirectionInGameState =
             movableDirections.filter { createDirectionPath().toSet().contains(it) }.toSet()
         topBarItems =
@@ -64,7 +68,7 @@ class LevelViewmodel : ViewModel() {
     // Creates a list of coordinates based on the current Level
     private fun createPathCoordinates(): MutableList<Pair<Int, Int>> {
         val movableDirections = createDirectionPath()
-        var currentPosition = Pair(0, 0)
+        var currentPosition = gameState.playerPosition
         val pathCoordinates = mutableListOf<Pair<Int, Int>>(currentPosition)
 
         movableDirections.forEach { direction ->
@@ -102,16 +106,18 @@ class LevelViewmodel : ViewModel() {
 
             if (currentItem.direction.value == Directions.Repeat) {
 
-                val usableChildren =
-                    currentItem.children.filter { it.direction.value != Directions.Nothing }
+                val usableChildren = currentItem.children.filter { it.direction.value != Directions.Nothing }
+                val repeats = currentItem.repeater?.intValue
                 usableTopBarItems.removeAt(i)
 
                 if (usableChildren.isEmpty()) {
                     break
                 }
 
-                for (j in usableChildren.size - 1 downTo 0) {
-                    usableTopBarItems.add(i, usableChildren[j])
+                repeat(repeats ?: 0){
+                    for (j in usableChildren.size - 1 downTo 0) {
+                        usableTopBarItems.add(i, usableChildren[j])
+                    }
                 }
 
             } else {

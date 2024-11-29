@@ -1,6 +1,5 @@
 package com.amaurysdm.codequest.model
 
-import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
@@ -15,11 +14,42 @@ data class LevelsCompletedData(var userId: String, var levelsCompleted: List<Lev
 
 object FireBaseController {
     val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    //var database: FirebaseFirestore = Firebase.firestore
 
     var loginJob = CoroutineScope(Dispatchers.IO + SupervisorJob())
     var registerJob = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
+    var completedLevels = mutableListOf<Level>()
+    var currentUser = User()
+
+    init {
+        val db = Firebase.firestore
+        val userId = auth.currentUser?.uid ?: ""
+        val levelsRef = db.collection("completedLevels").document(userId)
+        levelsRef.get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                val levels = document["levelsCompleted"] as? List<Map<String, Any>> ?: emptyList()
+                completedLevels = levels.map {
+                    Level(
+                        it["name"] as String, it["route"] as String, it["completed"] as Boolean
+                    )
+
+                }.toMutableList()
+
+            }
+        }
+        val usersRef = db.collection("user").document(userId)
+        usersRef.get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                currentUser = User(
+                    userId = document["userId"] as String,
+                    username = document["username"] as String,
+                    email = document["email"] as String,
+                    children = document["children"] as? List<String> ?: emptyList()
+                )
+            }
+        }
+
+    }
 
     fun login(loginData: LoginData, onLogin: () -> Unit) {
         loginJob.launch {
@@ -107,27 +137,33 @@ object FireBaseController {
         return user
     }
 
-    fun getCompletedLevels(): List<Level> {
-        val db = Firebase.firestore
-        val userId = auth.currentUser?.uid ?: ""
-        val usersRef = db.collection("completedLevels").document(userId)
-        var completedLevels = mutableListOf<Level>()
-        usersRef.get().addOnSuccessListener { document ->
-            if (document.exists()) {
-                val levels =
-                    document["levelsCompleted"] as? List<Map<String, Any>> ?: emptyList()
-                completedLevels = levels.map {
-                    Level(
-                        it["name"] as String, it["route"] as String, it["completed"] as Boolean
-                    )
+    /*    fun getCompletedLevels() {
+            val db = Firebase.firestore
+            val userId = auth.currentUser?.uid ?: ""
+            val usersRef = db.collection("completedLevels").document(userId)
+            var completedLevels = mutableListOf<Level>()
+            usersRef.get().addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val levels =
+                        document["levelsCompleted"] as? List<Map<String, Any>> ?: emptyList()
+                    Log.e("FireBaseController", "Level: -----------------${levels}")
+                    completedLevels = levels.map {
+                        Level(
+                            it["name"] as String, it["route"] as String, it["completed"] as Boolean
+                        )
 
-                }.toMutableList()
+                    }.toMutableList()
+                    Log.e("FireBaseController", "Completed Levels: -----------------${completedLevels}")
 
+                }
+            }.addOnCompleteListener{
+
+                Log.e("FireBaseController", "Completed and out of document: -----------------${completedLevels}")
             }
-        }
-        return completedLevels
+            Log.e("FireBaseController", "Out of document: -----------------${completedLevels}")
+            return completedLevels
 
-    }
+        }*/
 
 
     suspend fun beginningDestination(whenLoggedIn: () -> Unit, whenNotLoggedIn: () -> Unit) {

@@ -2,14 +2,17 @@ package com.amaurysdm.codequest.ui.levelselect
 
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
-import com.amaurysdm.codequest.model.FireBaseController
 import com.amaurysdm.codequest.model.Level
 import com.amaurysdm.codequest.model.LevelController
 import com.amaurysdm.codequest.navigation.Screens
 
 class LevelSelectViewmodel : ViewModel() {
-    val levels = LevelController.levels.value.size
-    //val levelsCompletedByUser = FireBaseController.getCompletedLevels()
+
+    var levels = LevelController.levels.value.size
+
+    fun getLevelsCompletedByUser(): List<Level> {
+        return LevelController.levels.value.filter { it.isCompleted }
+    }
 
     fun getLevel(it: Int): Level {
         return LevelController.getCertainLevel(it)
@@ -21,6 +24,10 @@ class LevelSelectViewmodel : ViewModel() {
     }
 
     fun leaveLevelSelect(navController: NavHostController) {
-        navController.popBackStack()
+        navController.navigate(Screens.General.route) {
+            popUpTo(navController.graph.startDestinationId) {
+                inclusive = true
+            }
+        }
     }
 }

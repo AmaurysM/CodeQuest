@@ -1,9 +1,7 @@
 package com.amaurysdm.codequest.model
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,7 +11,7 @@ object LevelController {
     private var currentLevel by mutableIntStateOf(0)
 
     private val _levels = MutableStateFlow<List<Level>>(emptyList())
-    val levels: StateFlow<List<Level>> = _levels // Expose as read-only StateFlow
+    val levels: StateFlow<List<Level>> = _levels
 
     init {
         val initialLevels = listOf(
@@ -22,11 +20,11 @@ object LevelController {
             Level("Level 3", "ddddddrrrruuulld", false),
             Level("Level 4", "rrddrrddrrddrrddrrddrrdd/", false)
         )
-        Log.w("LevelController", "Level: ${FireBaseController.getCompletedLevels()}")
+
         _levels.value = initialLevels.map { level ->
 
             level.copy(
-                isCompleted = FireBaseController.getCompletedLevels().any { it.route == level.route }
+                isCompleted = FireBaseController.completedLevels.any { it.route == level.route }
             )
         }
     }

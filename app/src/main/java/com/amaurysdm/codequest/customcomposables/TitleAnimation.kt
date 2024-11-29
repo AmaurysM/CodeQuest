@@ -1,7 +1,7 @@
 package com.amaurysdm.codequest.customcomposables
 
 import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
@@ -13,15 +13,15 @@ fun TitleAnimation(): Pair<Float, Float> {
     val infiniteTransition = rememberInfiniteTransition(label = "")
 
     val rotation = infiniteTransition.animateFloat(
-        initialValue = 0f,
+        initialValue = -15f,
         targetValue = 15f,
         label = "rotation logo",
         animationSpec = infiniteRepeatable(
             animation = keyframes {
-                durationMillis = 3000
-                -15f at 0 using FastOutLinearInEasing
-                15f at 1500
-                -15f at 3000 using FastOutSlowInEasing
+                durationMillis = 2000
+                -15f at 0 using LinearOutSlowInEasing
+                15f at 1000 using LinearOutSlowInEasing
+                -15f at 2000 using LinearOutSlowInEasing
             }
         )
     )
@@ -29,14 +29,14 @@ fun TitleAnimation(): Pair<Float, Float> {
 
     val bobbing = infiniteTransition.animateFloat(
         initialValue = 0f,
-        targetValue = 100f,
+        targetValue = 50f,
         label = "bobbing logo",
         animationSpec = infiniteRepeatable(
             animation = keyframes {
-                durationMillis = 3000
+                durationMillis = 4000
                 50f at 0
-                -50f at 1500 using FastOutLinearInEasing
-                50f at 3000
+                0f at 2000 using FastOutLinearInEasing
+                50f at 4000
             }
         )
     )/* */

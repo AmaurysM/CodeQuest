@@ -24,3 +24,10 @@ val movableDirections = mutableListOf<Directions>(
     Directions.Right,
     Directions.Repeat
 )
+
+val directions = mutableListOf<Directions>(
+    Directions.Up,
+    Directions.Down,
+    Directions.Left,
+    Directions.Right,
+)

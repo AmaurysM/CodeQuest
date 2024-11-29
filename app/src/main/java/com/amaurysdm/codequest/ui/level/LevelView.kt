@@ -48,7 +48,9 @@ import androidx.compose.ui.draganddrop.DragAndDropTransferData
 import androidx.compose.ui.draganddrop.mimeTypes
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
@@ -289,8 +291,15 @@ fun LevelView(
                         modifier = Modifier
                             .offset(x = tileSize * direction.first, y = tileSize * direction.second)
                             .size(tileSize)
-                            .background(Color.Red)
-                    )
+                    ) {
+                        Image(
+                            bitmap = ImageBitmap.imageResource(id = R.drawable.img_1),
+                            contentDescription = "background",
+                            modifier = Modifier.fillMaxSize(),
+                            alignment = Alignment.Center,
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
                 }
 
                 // Create End Square
@@ -301,15 +310,22 @@ fun LevelView(
                             tileSize * levelViewModel.gameState.path.last().second
                         )
                         .size(tileSize)
-                        .background(Color.Yellow)
-                )
+                ) {
+                    Image(
+                        bitmap = ImageBitmap.imageResource(id = R.drawable.img_1),
+                        contentDescription = "background",
+                        modifier = Modifier.fillMaxSize(),
+                        alignment = Alignment.Center,
+                        colorFilter = ColorFilter.tint(Color.Yellow, BlendMode.Softlight)
+                    )
+                }
 
                 // Create Player
                 Box(
                     modifier = Modifier
                         .offset(
-                            x = tileSize * levelViewModel.gameState.playerPosition.first,
-                            y = tileSize * levelViewModel.gameState.playerPosition.second
+                            x = tileSize * levelViewModel.animatableX.value,
+                            y = tileSize * levelViewModel.animatableY.value
                         )
                         .size(tileSize)
                         .background(Color.Blue)

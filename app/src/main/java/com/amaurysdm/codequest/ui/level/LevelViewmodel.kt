@@ -1,6 +1,8 @@
 package com.amaurysdm.codequest.ui.level
 
 import android.util.Log
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -17,10 +19,12 @@ import com.amaurysdm.codequest.model.GameState
 import com.amaurysdm.codequest.model.LevelController
 import com.amaurysdm.codequest.model.movableDirections
 import com.amaurysdm.codequest.navigation.Screens
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.coroutineContext
 
 data class TopBarItem(
     var direction: MutableState<Directions> = mutableStateOf(Directions.Nothing),
@@ -40,7 +44,10 @@ class LevelViewmodel : ViewModel() {
     var isAnimating by mutableStateOf(false)
     var screenPosition by mutableStateOf(Offset.Zero)
 
-    private var currentMove by mutableIntStateOf(0)
+    var currentMove by mutableIntStateOf(0)
+
+    val animatableX = Animatable(gameState.playerPosition.first.toFloat())
+    val animatableY = Animatable(gameState.playerPosition.second.toFloat())
 
 
     var topBarItems = mutableStateListOf<TopBarItem>()
@@ -97,7 +104,32 @@ class LevelViewmodel : ViewModel() {
         return changes
     }
 
-    private fun usableTopBarItems(): MutableList<TopBarItem> {
+    private fun locationOfTurnsAndFlag(points: List<Pair<Int, Int>>): List<Pair<Int, Int>> {
+
+        if (points.size < 3) return emptyList()
+
+        val turns = mutableListOf<Pair<Int, Int>>()
+
+        for (i in 1 until points.size - 1) {
+
+            val previous = points[i - 1]
+            val current = points[i]
+            val next = points[i + 1]
+
+            val vector1 = Pair(current.first - previous.first, current.second - previous.second)
+            val vector2 = Pair(next.first - current.first, next.second - current.second)
+
+            if (vector1.first * vector2.second != vector1.second * vector2.first) {
+                turns.add(current)
+            }
+            Log.e("LevelViewmodel", "turnsInLevel: $turns")
+
+        }
+        turns.add(points.last())
+        return turns
+    }
+
+    fun usableTopBarItems(): MutableList<TopBarItem> {
         val usableTopBarItems =
             topBarItems.filter { it.direction.value != Directions.Nothing }.toMutableList()
 
@@ -126,8 +158,6 @@ class LevelViewmodel : ViewModel() {
                 i++
             }
         }
-        Log.w("topBarItems", "$usableTopBarItems")
-
         return usableTopBarItems
     }
 
@@ -141,11 +171,15 @@ class LevelViewmodel : ViewModel() {
             )
     }
 
+
     suspend fun playButton(navController: NavHostController) {
         val chosenDirection = usableTopBarItems()
-
+        val turnsInLevel = locationOfTurnsAndFlag(gameState.path)
+        /*Log.e("LevelViewmodel", "turnsInLevel: $turnsInLevel")*/
         isAnimating = true
-        while (true) {
+        val scope = CoroutineScope(coroutineContext)
+
+        while (isAnimating) {
             delay(150)
             if (chosenDirection.isEmpty()) break
 
@@ -154,16 +188,30 @@ class LevelViewmodel : ViewModel() {
             }
 
             if (validMove(chosenDirection[currentMove].direction.value)) {
+                scope.launch {
+                    if (chosenDirection[currentMove].direction.value.movement.first == 0) {
+                        animatableY.animateTo(
+                            targetValue = turnsInLevel[currentMove].second.toFloat(),
+                            animationSpec = tween(durationMillis = 500)
+                        )
+                    } else {
+                        animatableX.animateTo(
+                            targetValue = turnsInLevel[currentMove].first.toFloat(),
+                            animationSpec = tween(durationMillis = 500)
+                        )
+                    }
+                }
                 gameState = gameState.copy(
                     playerPosition = Pair(
                         first = gameState.playerPosition.first + chosenDirection[currentMove].direction.value.movement.first,
                         second = gameState.playerPosition.second + chosenDirection[currentMove].direction.value.movement.second
                     )
                 )
+
+
             } else {
                 currentMove++
                 if (gameState.playerPosition == gameState.path.last()) {
-                    Log.w("LevelViewmodel", "Level completed")
                     withContext(Dispatchers.Main) {
                         launch {
                             navController.navigate(Screens.GameChild.LevelSelect.route)
@@ -171,10 +219,15 @@ class LevelViewmodel : ViewModel() {
                             FireBaseController.saveLevels()
                         }
                     }
-                    break
+
+                    resetAnimation()
+                    return
                 }
+
             }
+
         }
+        delay(1000)
         resetAnimation()
         resetPosition()
     }
@@ -184,8 +237,12 @@ class LevelViewmodel : ViewModel() {
         currentMove = 0
     }
 
-    private fun resetPosition() {
-        gameState = gameState.copy(playerPosition = createPathCoordinates().first())
+    private suspend fun resetPosition() {
+        gameState = gameState.copy(playerPosition = startLocation)
+
+        animatableX.animateTo(startLocation.first.toFloat())
+        animatableY.animateTo(startLocation.second.toFloat())
+
         isAnimating = false
     }
 

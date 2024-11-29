@@ -14,7 +14,7 @@ class SplashViewmodel : ViewModel() {
                     inclusive = true
                 }
             }
-        },{
+        }, {
             navController.navigate(Screens.UserCreation.route) {
                 popUpTo(navController.graph.startDestinationId) {
                     inclusive = true

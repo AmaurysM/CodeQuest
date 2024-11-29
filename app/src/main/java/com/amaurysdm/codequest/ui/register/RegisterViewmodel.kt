@@ -25,8 +25,7 @@ class RegisterViewmodel : ViewModel() {
             return
         }
 
-        FireBaseController.register(registerData
-            , onRegister = {
+        FireBaseController.register(registerData, onRegister = {
             navController.navigate(Screens.UserCreationChild.Login.route)
         })
 

@@ -107,7 +107,8 @@ class LevelViewmodel : ViewModel() {
 
             if (currentItem.direction.value == Directions.Repeat) {
 
-                val usableChildren = currentItem.children.filter { it.direction.value != Directions.Nothing }
+                val usableChildren =
+                    currentItem.children.filter { it.direction.value != Directions.Nothing }
                 val repeats = currentItem.repeater?.intValue
                 usableTopBarItems.removeAt(i)
 
@@ -115,7 +116,7 @@ class LevelViewmodel : ViewModel() {
                     break
                 }
 
-                repeat(repeats ?: 0){
+                repeat(repeats ?: 0) {
                     for (j in usableChildren.size - 1 downTo 0) {
                         usableTopBarItems.add(i, usableChildren[j])
                     }

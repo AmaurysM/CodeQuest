@@ -25,34 +25,41 @@ import com.amaurysdm.codequest.R
 fun UpDownKeys(
     modifier: Modifier = Modifier.background(MaterialTheme.colorScheme.background),
     initialNumber: MutableIntState = mutableIntStateOf(1)
-){
+) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-    ){
-        Box(modifier = Modifier.size(80.dp, 30.dp).clickable { initialNumber.intValue++ }
+    ) {
+        Box(modifier = Modifier
+            .size(80.dp, 30.dp)
+            .clickable { initialNumber.intValue++ }
             .padding(bottom = 5.dp)
             .clip(shape = MaterialTheme.shapes.extraSmall)
             .background(MaterialTheme.colorScheme.primary)
         ) {
-            Icon(imageVector = ImageVector.vectorResource(id = R.drawable.baseline_arrow_upward_24)
-                , contentDescription = null
-                , modifier = Modifier.align(Alignment.Center)
-                , tint = MaterialTheme.colorScheme.onPrimary
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.baseline_arrow_upward_24),
+                contentDescription = null,
+                modifier = Modifier.align(Alignment.Center),
+                tint = MaterialTheme.colorScheme.onPrimary
             )
         }
-        CreateText("${initialNumber.intValue}"
-            , modifier = Modifier.size(30.dp)
+        CreateText(
+            "${initialNumber.intValue}", modifier = Modifier.size(30.dp)
         )
-        Box( modifier = Modifier.size(80.dp, 30.dp).clickable{ if (initialNumber.intValue > 1) initialNumber.intValue-- }
-            .padding(top = 5.dp)
-            .clip(shape = MaterialTheme.shapes.extraSmall)
-            .background(MaterialTheme.colorScheme.primary)
+        Box(
+            modifier = Modifier
+                .size(80.dp, 30.dp)
+                .clickable { if (initialNumber.intValue > 1) initialNumber.intValue-- }
+                .padding(top = 5.dp)
+                .clip(shape = MaterialTheme.shapes.extraSmall)
+                .background(MaterialTheme.colorScheme.primary)
         ) {
-            Icon(imageVector = ImageVector.vectorResource(id = R.drawable.baseline_arrow_downward_24)
-                , contentDescription = null
-                , modifier = Modifier.align(Alignment.Center)
-                , tint = MaterialTheme.colorScheme.onPrimary
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.baseline_arrow_downward_24),
+                contentDescription = null,
+                modifier = Modifier.align(Alignment.Center),
+                tint = MaterialTheme.colorScheme.onPrimary
             )
         }
     }

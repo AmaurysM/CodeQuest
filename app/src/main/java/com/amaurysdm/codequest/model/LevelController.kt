@@ -1,34 +1,50 @@
 package com.amaurysdm.codequest.model
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 object LevelController {
 
     private var currentLevel by mutableIntStateOf(0)
 
-    private val levels = listOf<Level>(
-        Level("Level 1", "rrdrd/", false),
-        Level("Level 2", "ddrrddllu", false),
-        Level("Level 3", "ddddddrrrruuulld", false),
-        Level("Level 4", "rrddrrddrrddrrddrrddrrdd/", false)
-    )
+    private val _levels = MutableStateFlow<List<Level>>(emptyList())
+    val levels: StateFlow<List<Level>> = _levels // Expose as read-only StateFlow
+
+    init {
+        val initialLevels = listOf(
+            Level("Level 1", "rrdrd", false),
+            Level("Level 2", "ddrrdddllu", false),
+            Level("Level 3", "ddddddrrrruuulld", false),
+            Level("Level 4", "rrddrrddrrddrrddrrddrrdd/", false)
+        )
+        Log.w("LevelController", "Level: ${FireBaseController.getCompletedLevels()}")
+        _levels.value = initialLevels.map { level ->
+
+            level.copy(
+                isCompleted = FireBaseController.getCompletedLevels().any { it.route == level.route }
+            )
+        }
+    }
 
     fun getCertainLevel(level: Int): Level {
-        return levels[level]
+        return _levels.value[level]
     }
 
     fun getLevel(): Level {
-        return levels[currentLevel]
+        return levels.value[currentLevel]
     }
 
     fun numberOfLevels(): Int {
-        return levels.size
+        return levels.value.size
     }
 
     fun getAllLevels(): List<Level> {
-        return levels
+        return levels.value
     }
 
     fun nextLevel() {
@@ -38,5 +54,11 @@ object LevelController {
     fun setLevel(level: Int) {
         currentLevel = level
     }
+
+    /*fun setCompletedLevels(completedLevels: List<Level>) {
+        levels.forEach { level ->
+            level.isCompleted = completedLevels.any { it.name == level.name }
+        }
+    }*/
 
 }

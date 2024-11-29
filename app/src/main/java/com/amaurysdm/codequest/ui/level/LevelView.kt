@@ -59,8 +59,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.amaurysdm.codequest.customcomposables.CreateText
 import com.amaurysdm.codequest.R
+import com.amaurysdm.codequest.customcomposables.CreateText
 import com.amaurysdm.codequest.customcomposables.UpDownKeys
 import com.amaurysdm.codequest.model.Directions
 import kotlinx.coroutines.Dispatchers
@@ -274,8 +274,8 @@ fun LevelView(
                     .fillMaxWidth()
                     .fillMaxHeight(0.9f)
                     .offset(
-                        x = levelViewModel.screenPosition.x.dp/5,
-                        y = levelViewModel.screenPosition.y.dp/5
+                        x = levelViewModel.screenPosition.x.dp / 5,
+                        y = levelViewModel.screenPosition.y.dp / 5
                     )
 
             ) {

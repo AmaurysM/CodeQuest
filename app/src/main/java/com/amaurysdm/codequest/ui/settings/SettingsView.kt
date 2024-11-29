@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -34,7 +33,7 @@ import com.amaurysdm.codequest.R
 fun SettingsView(
     navController: NavHostController = rememberNavController(),
     settingsViewmodel: SettingsViewmodel = viewModel()
-){
+) {
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -48,14 +47,15 @@ fun SettingsView(
         )
 
         Column(
-            modifier = Modifier.align(Alignment.Center)
+            modifier = Modifier
+                .align(Alignment.Center)
                 .fillMaxWidth()
                 .padding(40.dp)
                 .clip(MaterialTheme.shapes.small)
                 .background(MaterialTheme.colorScheme.surface)
-                .padding(20.dp)
-            , horizontalAlignment = Alignment.CenterHorizontally
-            , verticalArrangement = Arrangement.spacedBy(10.dp)
+                .padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
 
             Box(
@@ -71,8 +71,8 @@ fun SettingsView(
                 )
             }
 
-            Text(text = "Email: ${settingsViewmodel.userEmail}")
-            Text(text = "Password: ${settingsViewmodel.userUid}")
+            Text(text = "Username: ${settingsViewmodel.user.username}")
+            Text(text = "Email: ${settingsViewmodel.user.email}")
 
             Button(onClick = { settingsViewmodel.logout(navController) }) {
                 Text(text = "Logout")

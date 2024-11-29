@@ -1,14 +1,8 @@
 package com.amaurysdm.codequest.model
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.navigation.NavHostController
-import com.amaurysdm.codequest.navigation.Screens
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,29 +11,11 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-data class LevelsCompletedData(var userId: String, var levelsCompleted: Array<Level>) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as LevelsCompletedData
-
-        if (userId != other.userId) return false
-        if (!levelsCompleted.contentEquals(other.levelsCompleted)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = userId.hashCode()
-        result = 31 * result + levelsCompleted.contentHashCode()
-        return result
-    }
-}
+data class LevelsCompletedData(var userId: String, var levelsCompleted: List<Level>)
 
 object FireBaseController {
     val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    var database: FirebaseFirestore = Firebase.firestore
+    //var database: FirebaseFirestore = Firebase.firestore
 
     var loginJob = CoroutineScope(Dispatchers.IO + SupervisorJob())
     var registerJob = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -57,14 +33,12 @@ object FireBaseController {
         }
     }
 
-    fun register(registerData: RegisterData, onRegister: () -> Unit): Boolean {
-        var completed by mutableStateOf(false)
+    fun register(registerData: RegisterData, onRegister: () -> Unit) {
         registerJob.launch {
             auth.createUserWithEmailAndPassword(registerData.email, registerData.password)
                 .addOnCompleteListener { task ->
 
                     if (task.isSuccessful) {
-                        completed = true
                         onRegister()
                         saveUserData(registerData)
 
@@ -72,10 +46,10 @@ object FireBaseController {
                 }
 
         }
-        return completed
     }
 
     private fun saveUserData(registerData: RegisterData) {
+        val database = Firebase.firestore
         val user = User(
             userId = auth.currentUser?.uid ?: "",
             username = registerData.username,
@@ -83,55 +57,77 @@ object FireBaseController {
         )
         val usersRef = database.collection("user").document(user.userId)
         usersRef.set(user)
-            .addOnCompleteListener {
-                Log.d("FireBaseController", "User data saved successfully")
-
-            }.addOnFailureListener {
-                Log.e("FireBaseController", "Error saving user data: ${it.message}")
-            }
 
     }
 
-    fun saveLevels(){
+    fun saveLevels() {
+        val db = Firebase.firestore
         val userId = auth.currentUser?.uid ?: ""
-        val usersRef = database.collection("completedLevels").document(userId)
 
-        val newLevels = LevelsCompletedData(
-            userId = auth.currentUser?.uid ?: "",
-            levelsCompleted = LevelController.getAllLevels().filter { it.isCompleted }.toTypedArray()
-        )
+        val usersRef = db.collection("completedLevels").document(userId)
 
-        usersRef.get().addOnSuccessListener { documentSnapshot ->
-            if (documentSnapshot.exists()) {
-                //val existingLevels = documentSnapshot.get("levelsCompleted") as? List<String> ?: emptyList()
-                /*val existingLevels = (documentSnapshot.get("levelsCompleted") as? Array<String>)?.toMutableList() ?: mutableListOf()
+        val newLevels = LevelController.getAllLevels().filter { it.isCompleted }
+        usersRef.get()
+            .addOnSuccessListener { document ->
 
-
-                    // (existingLevels?.levelsCompleted?.plus(newLevels.levelsCompleted)?.toSet() ?: newLevels.levelsCompleted)
-                val updatedLevels = existingLevels.plus(newLevels.levelsCompleted).toSet()
-
-                usersRef.update("levelsCompleted", updatedLevels)
-                    .addOnSuccessListener {
-                        Log.d("FireBaseController", "User levelsCompleted updated successfully")
+                if (document.exists()) {
+                    val levels =
+                        document["levelsCompleted"] as? List<Map<String, Any>> ?: emptyList()
+                    val existingLevels = levels.map {
+                        Level(
+                            it["name"] as String, it["route"] as String, it["completed"] as Boolean
+                        )
                     }
-                    .addOnFailureListener {
-                        Log.e("FireBaseController", "Error updating user levelsCompleted data: ${it.message}")
 
-                    }*/
+                    val updatedLevels = existingLevels.plus(newLevels).toSet().toList()
+                    usersRef.set(LevelsCompletedData(userId, updatedLevels))
 
-            } else {
-
-                usersRef.set(newLevels).addOnSuccessListener {
-                    Log.d("FireBaseController", "User levelsCompleted saved successfully")
-                }.addOnFailureListener {
-                    Log.e("FireBaseController", "Error saving user levelsCompleted data: ${it.message}")
+                } else {
+                    usersRef.set(LevelsCompletedData(userId, newLevels))
                 }
             }
-        }.addOnFailureListener {
-            Log.e("FireBaseController", "Error getting user levelsCompleted data: ${it.message}")
-        }
+
     }
 
+    fun getUserCurrentUserData(): User {
+        val db = Firebase.firestore
+        val userId = auth.currentUser?.uid ?: ""
+        val usersRef = db.collection("user").document(userId)
+        var user = User()
+        usersRef.get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                user = User(
+                    userId = document["userId"] as String,
+                    username = document["username"] as String,
+                    email = document["email"] as String,
+                    children = document["children"] as? List<String> ?: emptyList()
+                )
+            }
+        }
+        return user
+    }
+
+    fun getCompletedLevels(): List<Level> {
+        val db = Firebase.firestore
+        val userId = auth.currentUser?.uid ?: ""
+        val usersRef = db.collection("completedLevels").document(userId)
+        var completedLevels = mutableListOf<Level>()
+        usersRef.get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                val levels =
+                    document["levelsCompleted"] as? List<Map<String, Any>> ?: emptyList()
+                completedLevels = levels.map {
+                    Level(
+                        it["name"] as String, it["route"] as String, it["completed"] as Boolean
+                    )
+
+                }.toMutableList()
+
+            }
+        }
+        return completedLevels
+
+    }
 
 
     suspend fun beginningDestination(whenLoggedIn: () -> Unit, whenNotLoggedIn: () -> Unit) {

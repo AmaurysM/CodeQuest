@@ -8,19 +8,12 @@ import androidx.navigation.NavHostController
 import com.amaurysdm.codequest.model.FireBaseController
 import com.amaurysdm.codequest.model.LoginData
 import com.amaurysdm.codequest.navigation.Screens
-import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 
 class LoginViewmodel : ViewModel() {
     var loginData by mutableStateOf(LoginData())
 
-    fun saveUser(){
+    fun saveUser() {
 
         FireBaseController.saveLevels()
     }

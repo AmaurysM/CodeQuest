@@ -2,8 +2,8 @@ package com.amaurysdm.codequest.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
-import com.amaurysdm.codequest.navigation.Screens
 import com.amaurysdm.codequest.model.FireBaseController
+import com.amaurysdm.codequest.navigation.Screens
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,13 +12,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SettingsViewmodel : ViewModel() {
-
-
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    /*val userEmail: String = auth.currentUser?.email ?: ""
-    val userUid: String = auth.currentUser?.uid ?: ""*/
+
     private var loginJob = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    val user = FireBaseController.getUserCurrentUserData()
+    var user = FireBaseController.currentUser
 
     fun logout(navController: NavHostController) {
         loginJob.launch {
@@ -37,4 +34,6 @@ class SettingsViewmodel : ViewModel() {
             }
         }
     }
+
+
 }

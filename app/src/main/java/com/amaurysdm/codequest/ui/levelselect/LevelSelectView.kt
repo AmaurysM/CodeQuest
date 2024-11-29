@@ -38,6 +38,7 @@ fun LevelSelectView(
     navController: NavHostController = rememberNavController(),
     levelSelectViewModel: LevelSelectViewmodel = viewModel()
 ) {
+
     Box {
         Image(
             bitmap = ImageBitmap.imageResource(id = R.drawable.grass_background),
@@ -78,7 +79,7 @@ fun LevelSelectView(
                                 .padding(10.dp)
                                 .clip(MaterialTheme.shapes.medium)
                                 .border(15.dp, MaterialTheme.colorScheme.primary)
-                                .background(if (levelSelectViewModel.getLevel(it).isCompleted) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.background)
+                                .background(if (levelSelectViewModel.getLevel(it).isCompleted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.background)
                                 .clickable {
                                     levelSelectViewModel.navigateToLevel(navController, it)
                                 }

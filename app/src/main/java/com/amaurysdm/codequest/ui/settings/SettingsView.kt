@@ -5,14 +5,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +40,7 @@ fun SettingsView(
     settingsViewmodel: SettingsViewmodel = viewModel()
 ) {
 
+    val isAddingChild = remember { mutableStateOf(false)}
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -46,7 +52,7 @@ fun SettingsView(
             contentScale = ContentScale.FillHeight
         )
 
-        Column(
+        Box(
             modifier = Modifier
                 .align(Alignment.Center)
                 .fillMaxWidth()
@@ -54,8 +60,6 @@ fun SettingsView(
                 .clip(MaterialTheme.shapes.small)
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
 
             Box(
@@ -71,13 +75,57 @@ fun SettingsView(
                 )
             }
 
-            Text(text = "Username: ${settingsViewmodel.user.username}")
-            Text(text = "Email: ${settingsViewmodel.user.email}")
-
-            Button(onClick = { settingsViewmodel.logout(navController) }) {
-                Text(text = "Logout")
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ){
+                Text(text = "Username: ${settingsViewmodel.user.username}")
+                Text(text = "Email: ${settingsViewmodel.user.email}")
             }
 
+            if(settingsViewmodel.areYouAParent()) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        settingsViewmodel.children.forEach {
+                            Text(text = it)
+                        }
+                    }
+                    Button(onClick = {
+                        isAddingChild.value = !isAddingChild.value }
+                    ) {
+                        Text(text = "Add Child")
+                    }
+
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ){
+                Button(onClick = { settingsViewmodel.back(navController) }) {
+                    Text(text = "Back")
+                }
+                Button(onClick = { settingsViewmodel.logout(navController) }) {
+                    Text(text = "Logout")
+                }
+            }
+        }
+
+        if(isAddingChild.value) {
+/*            Column {
+                Text(text = "Add Child")
+                OutlinedTextField(
+                    value = settingsViewmodel.childName,
+                    onValueChange = { settingsViewmodel.childName = it },
+                    label = { Text("Child Name") }
+                )
+            }*/
         }
 
     }

@@ -7,6 +7,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -17,17 +19,28 @@ object FireBaseController {
 
     var loginJob = CoroutineScope(Dispatchers.IO + SupervisorJob())
     var registerJob = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    var coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     var completedLevels = mutableListOf<Level>()
     var currentUser = User()
 
     init {
+        val user = auth.currentUser
+        if (user != null) {
+            getUserData()
+        }
+
+    }
+
+    fun getUserData(){
         val db = Firebase.firestore
         val userId = auth.currentUser?.uid ?: ""
+
         val levelsRef = db.collection("completedLevels").document(userId)
         levelsRef.get().addOnSuccessListener { document ->
             if (document.exists()) {
-                val levels = document["levelsCompleted"] as? List<Map<String, Any>> ?: emptyList()
+                val levels =
+                    document["levelsCompleted"] as? List<Map<String, Any>> ?: emptyList()
                 completedLevels = levels.map {
                     Level(
                         it["name"] as String, it["route"] as String, it["completed"] as Boolean
@@ -44,7 +57,9 @@ object FireBaseController {
                     userId = document["userId"] as String,
                     username = document["username"] as String,
                     email = document["email"] as String,
-                    children = document["children"] as? List<String> ?: emptyList()
+                    children = document["children"] as? List<String> ?: emptyList(),
+                    parent = document["parent"] as? String ?: "",
+                    isAParent = document["aparent"] as? Boolean ?: false
                 )
             }
         }
@@ -83,7 +98,10 @@ object FireBaseController {
         val user = User(
             userId = auth.currentUser?.uid ?: "",
             username = registerData.username,
-            email = registerData.password
+            email = registerData.password,
+            children = emptyList(),
+            parent = "",
+            isAParent = registerData.areYouAParent
         )
         val usersRef = database.collection("user").document(user.userId)
         usersRef.set(user)
@@ -137,35 +155,6 @@ object FireBaseController {
         return user
     }
 
-    /*    fun getCompletedLevels() {
-            val db = Firebase.firestore
-            val userId = auth.currentUser?.uid ?: ""
-            val usersRef = db.collection("completedLevels").document(userId)
-            var completedLevels = mutableListOf<Level>()
-            usersRef.get().addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val levels =
-                        document["levelsCompleted"] as? List<Map<String, Any>> ?: emptyList()
-                    Log.e("FireBaseController", "Level: -----------------${levels}")
-                    completedLevels = levels.map {
-                        Level(
-                            it["name"] as String, it["route"] as String, it["completed"] as Boolean
-                        )
-
-                    }.toMutableList()
-                    Log.e("FireBaseController", "Completed Levels: -----------------${completedLevels}")
-
-                }
-            }.addOnCompleteListener{
-
-                Log.e("FireBaseController", "Completed and out of document: -----------------${completedLevels}")
-            }
-            Log.e("FireBaseController", "Out of document: -----------------${completedLevels}")
-            return completedLevels
-
-        }*/
-
-
     suspend fun beginningDestination(whenLoggedIn: () -> Unit, whenNotLoggedIn: () -> Unit) {
         var isLoggedIn = false
 
@@ -183,5 +172,23 @@ object FireBaseController {
         } else {
             whenNotLoggedIn()
         }
+    }
+
+    suspend fun getUser(children: String): User {
+        val db = Firebase.firestore
+        val usersRef = db.collection("user").document(children)
+        var user = User()
+        coroutineScope.launch {
+        usersRef.get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                user = User(
+                    userId = document["userId"] as String,
+                    username = document["username"] as String,
+                    email = document["email"] as String,
+                    children = document["children"] as? List<String> ?: emptyList()
+                )
+            }
+        }}.join()
+        return user
     }
 }

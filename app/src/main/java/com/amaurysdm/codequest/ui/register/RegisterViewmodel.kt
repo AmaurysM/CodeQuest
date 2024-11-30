@@ -1,5 +1,6 @@
 package com.amaurysdm.codequest.ui.register
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -14,8 +15,6 @@ import kotlinx.coroutines.cancel
 class RegisterViewmodel : ViewModel() {
     var registerData by mutableStateOf(RegisterData())
 
-    private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
-
     fun register(navController: NavHostController) {
         if (registerData.email.isEmpty() || registerData.password.isEmpty() || registerData.confirmPassword.isEmpty()) {
             return
@@ -25,11 +24,13 @@ class RegisterViewmodel : ViewModel() {
             return
         }
 
+        registerData.areYouAParent = SharedRegisterViewmodel.userBeingCreated.isAParent
+
+        Log.e("registerData", registerData.toString())
+
         FireBaseController.register(registerData, onRegister = {
             navController.navigate(Screens.UserCreationChild.Login.route)
         })
-
-
     }
 
     fun goBack(navController: NavHostController) {

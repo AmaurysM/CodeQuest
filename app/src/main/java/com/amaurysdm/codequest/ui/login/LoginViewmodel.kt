@@ -33,6 +33,7 @@ class LoginViewmodel : ViewModel() {
                     inclusive = true
                 }
             }
+            FireBaseController.getUserData()
         })
     }
 

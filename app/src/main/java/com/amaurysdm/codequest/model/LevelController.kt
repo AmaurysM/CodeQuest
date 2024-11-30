@@ -18,9 +18,9 @@ object LevelController {
             Level("Level 1", "rrdrd", false),
             Level("Level 2", "ddrrdddllu", false),
             Level("Level 3", "ddddddrrrruuulld", false),
-            Level("Level 4", "rrddrrddrrddrrddrrddrrdd/", false),
-            Level("Level 4", "ddrrdddldldld/", false)
-
+            Level("Level 4", "rdrdrdrdrdrd/", false),
+            Level("Level 5", "ddrrdddldldld/", false),
+            Level("Level 6", "urururrrrddldldld/", false)
         )
 
         _levels.value = initialLevels.map { level ->

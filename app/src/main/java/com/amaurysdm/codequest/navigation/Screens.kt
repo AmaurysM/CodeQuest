@@ -13,6 +13,7 @@ sealed class Screens(val route: String) {
         data object Welcome : UserCreationChild("welcome")
         data object Login : UserCreationChild("login")
         data object Register : UserCreationChild("register")
+        data object ParentOrChild : UserCreationChild("parentOrChild")
     }
 
     // Child Navigation: General

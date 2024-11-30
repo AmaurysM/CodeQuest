@@ -200,14 +200,14 @@ class LevelViewmodel : ViewModel() {
                             animationSpec = tween(durationMillis = 500)
                         )
                     }
-                }
+                }.join()
+
                 gameState = gameState.copy(
                     playerPosition = Pair(
-                        first = gameState.playerPosition.first + chosenDirection[currentMove].direction.value.movement.first,
-                        second = gameState.playerPosition.second + chosenDirection[currentMove].direction.value.movement.second
+                        first = animatableX.value.toInt(),
+                        second = animatableY.value.toInt()
                     )
                 )
-
 
             } else {
                 currentMove++
@@ -227,7 +227,7 @@ class LevelViewmodel : ViewModel() {
             }
 
         }
-        delay(1000)
+        delay(500)
         resetAnimation()
         resetPosition()
     }

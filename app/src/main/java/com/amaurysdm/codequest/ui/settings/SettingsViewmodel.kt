@@ -10,7 +10,9 @@ import androidx.navigation.NavHostController
 import com.amaurysdm.codequest.model.FireBaseController
 import com.amaurysdm.codequest.model.User
 import com.amaurysdm.codequest.navigation.Screens
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -25,30 +27,42 @@ class SettingsViewmodel : ViewModel() {
     var user by mutableStateOf(User())
 
     var isParent by mutableStateOf(user.isAParent)
-    var children by mutableStateOf(user.children)
+    var childIDs by mutableStateOf(user.children)
+    var children = mutableStateListOf<User>()
+
+    var newChild by mutableStateOf(User())
+    var isAddingChild = mutableStateOf(false)
+    var isEditingChild = mutableStateOf(false)
+    var editingChild by mutableStateOf(User())
 
     init {
+
+        updateChildren()
+
+    }
+
+    fun updateChildren() {
         user = FireBaseController.currentUser
-        /*isParent = user.isAParent
-        children = user.children*/
-
-    }/**/
-
-    suspend fun getChildren(): MutableList<User> {
-        val foundChildren = mutableListOf<User>()
-        children.forEach { child ->
-            foundChildren.add(FireBaseController.getUser(child))
+        isParent = user.isAParent
+        childIDs = user.children
+        CoroutineScope(Dispatchers.Main).launch {
+            childIDs.forEach { child ->
+                launch {
+                    children.add(FireBaseController.getUser(child))
+                }.join()
+                Log.e("TAG", "Children: ${children}")
+                Log.e("TAG", "Children IDs: ${childIDs}")
+            }
         }
-        return foundChildren
+
     }
 
     fun areYouAParent(): Boolean {
 
-            user = FireBaseController.currentUser
-            isParent = user.isAParent
-            children = user.children
+        user = FireBaseController.currentUser
+        isParent = user.isAParent
+        childIDs = user.children
 
-        Log.e("isAParent", isParent.toString())
         return isParent
     }
 
@@ -76,6 +90,47 @@ class SettingsViewmodel : ViewModel() {
                 inclusive = true
             }
         }
+
+    }
+
+    suspend fun getChild(child: String): User {
+        return withContext(Dispatchers.IO) {
+            try {
+                FireBaseController.getUser(child)
+            } catch (e: Exception) {
+                throw e
+            }
+        }
+    }
+
+    suspend fun addChild() {
+        val database = Firebase.firestore
+
+        var newChildEmail: User? = User()
+        Log.e("TAG", "Child IDs: ${childIDs}")
+        Log.e("TAG", "Children: ${children}")
+
+        Log.e("TAG", "New Child: ${newChild}")
+
+        CoroutineScope(Dispatchers.IO).launch {
+            newChildEmail = FireBaseController.getUserFromEmail(newChild.email)
+
+        }.join()
+        database.collection("user")
+            .document(user.userId)
+            .update("children", user.children.plus(newChildEmail?.userId))
+
+        isAddingChild.value = false
+        updateChildren()
+
+
+    }
+
+    fun removeChild() {
+        val database = Firebase.firestore
+        database.collection("user")
+            .document(user.userId)
+            .update("children", user.children.minus(editingChild.userId))
 
     }
 

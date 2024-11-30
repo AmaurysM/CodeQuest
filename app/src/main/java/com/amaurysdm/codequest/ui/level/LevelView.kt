@@ -79,7 +79,8 @@ fun LevelView(
 ) {
     val coroutineScope = rememberCoroutineScope()
 
-    Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
+    Scaffold(modifier = Modifier.fillMaxSize()
+        , bottomBar = {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

@@ -5,5 +5,7 @@ data class User(
     val username: String = "",
     val email: String = "",
     val listLevels: List<GameState> = emptyList(),
-    val children: List<String> = emptyList()
+    val children: List<String> = emptyList(),
+    val parent: String = "",
+    var isAParent: Boolean = false
 )

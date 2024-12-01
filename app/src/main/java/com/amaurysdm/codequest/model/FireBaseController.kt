@@ -15,7 +15,6 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-data class LevelsCompletedData(var userId: String, var levelsCompleted: List<Level>)
 
 object FireBaseController {
     val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -35,7 +34,7 @@ object FireBaseController {
 
     }
 
-    fun getUserData(){
+    fun getUserData() {
         val db = Firebase.firestore
         val userId = auth.currentUser?.uid ?: ""
 
@@ -117,7 +116,7 @@ object FireBaseController {
 
         val usersRef = db.collection("completedLevels").document(userId)
 
-        val newLevels = LevelController.getAllLevels().filter { it.isCompleted }
+        val newLevels = LevelController.getAllLevels().filter { it.completed }
         usersRef.get()
             .addOnSuccessListener { document ->
 
@@ -178,6 +177,7 @@ object FireBaseController {
     }
 
     suspend fun getUser(userID: String): User {
+
         val db = Firebase.firestore
         val userRef = db.collection("user").document(userID)
         return suspendCoroutine { continuation ->
@@ -189,6 +189,7 @@ object FireBaseController {
                         email = document["email"] as String,
                         children = document["children"] as? List<String> ?: emptyList()
                     )
+                    Log.e("TAG", "getUser: $user")
                     continuation.resume(user)
                 } else {
                     continuation.resume(User())
@@ -197,6 +198,7 @@ object FireBaseController {
                 continuation.resumeWithException(exception)
             }
         }
+
     }
 
     suspend fun getUserFromEmail(email: String): User? {
@@ -214,6 +216,28 @@ object FireBaseController {
             }
         } catch (e: Exception) {
             null
+        }
+
+    }
+
+    suspend fun getCompletedLevelsByUser(id: String): List<Level?> {
+        val db = Firebase.firestore
+        val usersRef = db.collection("completedLevels").document(id)
+
+        return try {
+            usersRef.get().await().let { document ->
+                val levels =
+                    document["levelsCompleted"] as? List<Map<String, Any>> ?: emptyList()
+
+                levels.map {
+                    Level(
+                        it["name"] as String, it["route"] as String, it["completed"] as Boolean
+                    )
+                }
+            }
+
+        } catch (e: Exception) {
+            emptyList()
         }
 
     }

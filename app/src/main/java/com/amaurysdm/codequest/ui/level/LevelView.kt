@@ -79,8 +79,9 @@ fun LevelView(
 ) {
     val coroutineScope = rememberCoroutineScope()
 
-    Scaffold(modifier = Modifier.fillMaxSize()
-        , bottomBar = {
+
+
+    Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -172,9 +173,8 @@ fun LevelView(
             levelViewModel.topBarItems.forEachIndexed { index, _ ->
 
                 Box(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(RoundedCornerShape(10.dp))
+                    modifier = modifier
+                        .size(90.dp)
                         .padding(10.dp)
                         .background(MaterialTheme.colorScheme.primary)
                         .border(BorderStroke(1.dp, Color.Black))
@@ -250,8 +250,8 @@ fun LevelView(
     }
     ) { paddingValues ->
         Box(
-            modifier = modifier
-                .padding(vertical = paddingValues.calculateTopPadding() - 25.dp)
+            modifier = Modifier
+                //.padding(vertical = paddingValues.calculateTopPadding())
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
                         change.consume()
@@ -329,8 +329,14 @@ fun LevelView(
                             y = tileSize * levelViewModel.animatableY.value
                         )
                         .size(tileSize)
-                        .background(Color.Blue)
-                )
+                ) {
+                    Image(
+                        bitmap = ImageBitmap.imageResource(id = R.drawable.rocks),
+                        contentDescription = "background",
+                        modifier = Modifier.fillMaxSize(),
+                        alignment = Alignment.Center,
+                    )
+                }
             }
 
             AnimatedVisibility(

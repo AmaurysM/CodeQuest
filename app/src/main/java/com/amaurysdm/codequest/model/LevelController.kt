@@ -26,7 +26,7 @@ object LevelController {
         _levels.value = initialLevels.map { level ->
 
             level.copy(
-                isCompleted = FireBaseController.completedLevels.any { it.route == level.route }
+                completed = FireBaseController.completedLevels.any { it.route == level.route }
             )
         }
     }

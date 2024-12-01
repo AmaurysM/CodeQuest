@@ -11,19 +11,26 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.vectorResource
@@ -33,10 +40,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.amaurysdm.codequest.R
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun SettingsView(
@@ -44,8 +49,9 @@ fun SettingsView(
     settingsViewmodel: SettingsViewmodel = viewModel()
 ) {
 
-    //val isAddingChild = remember { mutableStateOf(false)}
-    val scope = CoroutineScope(Dispatchers.IO)
+    val kids by settingsViewmodel.childrenFlow.collectAsState(emptyList())
+    val kidLevels by settingsViewmodel.editingChildLevelsFlow.collectAsState(emptyList())
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -57,16 +63,16 @@ fun SettingsView(
             contentScale = ContentScale.FillHeight
         )
 
-        Column (
+        Column(
             modifier = Modifier
                 .align(Alignment.Center)
                 .fillMaxWidth()
                 .padding(40.dp)
                 .clip(MaterialTheme.shapes.small)
                 .background(MaterialTheme.colorScheme.surface)
-                .padding(20.dp)
-            , horizontalAlignment = Alignment.CenterHorizontally
-            , verticalArrangement = Arrangement.spacedBy(10.dp)
+                .padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
 
             Box(
@@ -86,41 +92,45 @@ fun SettingsView(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(10.dp)
-            ){
+            ) {
                 Text(text = "Username: ${settingsViewmodel.user.username}")
                 Text(text = "Email: ${settingsViewmodel.user.email}")
             }
 
-            if(settingsViewmodel.areYouAParent()) {
+            if (settingsViewmodel.dropDownActive) {
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                        .background(MaterialTheme.colorScheme.surface)
+                        .verticalScroll(state = rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceBetween
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Column {
-                        settingsViewmodel.children.forEach {
+                        kids.forEach {
                             Row(
-                                modifier = Modifier.fillMaxWidth()
-                                    .padding(10.dp)
-                                , horizontalArrangement = Arrangement.SpaceBetween
-                                , verticalAlignment = Alignment.CenterVertically
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(10.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(text = it.username)
-                                Icon(imageVector = ImageVector.vectorResource(id = R.drawable.baseline_edit_24)
-                                    , contentDescription = null
-                                    , modifier = Modifier.clickable {
-                                        settingsViewmodel.isEditingChild.value = true
-                                        settingsViewmodel.editingChild = it
-                                    })
-                            }
+                                Text(text = it.email)
+                                Icon(imageVector = ImageVector.vectorResource(id = R.drawable.baseline_edit_24),
+                                    contentDescription = null,
+                                    modifier = Modifier.clickable {
+                                        settingsViewmodel.isEditingChild = true
+                                        settingsViewmodel.observeChildLevels(it)
 
+                                    })
+
+                            }
                         }
                     }
-                    Button(onClick = {
-                            settingsViewmodel.isAddingChild.value = !settingsViewmodel.isAddingChild.value
-                        }
-                        , modifier = Modifier.fillMaxWidth()
-                        , shape = MaterialTheme.shapes.extraSmall
+
+                    Button(onClick = { settingsViewmodel.isAddingChild = true },
+                        shape = MaterialTheme.shapes.extraSmall
                     ) {
                         Text(text = "Add Child")
                     }
@@ -128,31 +138,47 @@ fun SettingsView(
                 }
             }
 
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
-            ){
-                Button(onClick = { settingsViewmodel.back(navController) }
-                    , shape = MaterialTheme.shapes.extraSmall
+            ) {
+                Button(onClick = { settingsViewmodel.back(navController) },
+                    shape = MaterialTheme.shapes.extraSmall
                 ) {
                     Text(text = "Back")
                 }
 
-                Button(onClick = { settingsViewmodel.logout(navController) }
-                    , shape = MaterialTheme.shapes.extraSmall
+                if (settingsViewmodel.isParent) {
+                    Icon(imageVector =
+                    if (!settingsViewmodel.dropDownActive)
+                        Icons.Filled.KeyboardArrowDown
+                    else
+                        Icons.Filled.KeyboardArrowUp,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .clickable {
+                                settingsViewmodel.dropDownActive = !settingsViewmodel.dropDownActive
+                            }
+                            .size(30.dp)
+                    )
+                }
+
+                Button(onClick = { settingsViewmodel.logout(navController) },
+                    shape = MaterialTheme.shapes.extraSmall
                 ) {
                     Text(text = "Logout")
                 }
             }
         }
 
-        if(settingsViewmodel.isAddingChild.value) {
+        if (settingsViewmodel.isAddingChild) {
             Box(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .fillMaxSize()
                     .background(Color.Black.copy(alpha = 0.3f))
-                    .clickable{
+                    .clickable {
                         ; // Do nothing
                     }
             ) {
@@ -163,9 +189,9 @@ fun SettingsView(
                         .padding(40.dp)
                         .clip(MaterialTheme.shapes.small)
                         .background(MaterialTheme.colorScheme.surface)
-                        .padding(20.dp)
-                    , horizontalAlignment = Alignment.CenterHorizontally
-                    , verticalArrangement = Arrangement.spacedBy(10.dp)
+                        .padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Text(text = "Add Child")
 
@@ -173,7 +199,10 @@ fun SettingsView(
                     Column {
                         OutlinedTextField(
                             value = settingsViewmodel.newChild.email,
-                            onValueChange = {settingsViewmodel.newChild = settingsViewmodel.newChild.copy(email = it)},
+                            onValueChange = {
+                                settingsViewmodel.newChild =
+                                    settingsViewmodel.newChild.copy(email = it)
+                            },
                             label = { Text(text = "Child Email") }
                         )
                     }
@@ -181,14 +210,19 @@ fun SettingsView(
                     Row {
                         Button(
                             onClick = {
-                                settingsViewmodel.isAddingChild.value = !settingsViewmodel.isAddingChild.value
+                                //settingsViewmodel.isAddingChild.value = !settingsViewmodel.isAddingChild.value
+                                settingsViewmodel.isAddingChild = false
+                                //settingsViewmodel.addChild()
                             }
                         ) {
                             Text(text = "Cancel")
                         }
 
                         Button(onClick = {
-                            scope.launch { settingsViewmodel.addChild() }
+                            settingsViewmodel.isAddingChild = false
+                            settingsViewmodel.addChild()
+
+                            //scope.launch { settingsViewmodel.addChild() }
                         }
                         ) {
                             Text(text = "Add")
@@ -202,13 +236,13 @@ fun SettingsView(
 
         }
 
-        if(settingsViewmodel.isEditingChild.value) {
+        if (settingsViewmodel.isEditingChild) {
             Box(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .fillMaxSize()
                     .background(Color.Black.copy(alpha = 0.3f))
-                    .clickable{
+                    .clickable {
                         ; // Do nothing
                     }
             ) {
@@ -219,9 +253,9 @@ fun SettingsView(
                         .padding(40.dp)
                         .clip(MaterialTheme.shapes.small)
                         .background(MaterialTheme.colorScheme.surface)
-                        .padding(20.dp)
-                    , horizontalAlignment = Alignment.CenterHorizontally
-                    , verticalArrangement = Arrangement.spacedBy(10.dp)
+                        .padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Text(text = "Child Info")
 
@@ -229,27 +263,29 @@ fun SettingsView(
                     Column {
                         Text(text = "Child Email: ${settingsViewmodel.editingChild.email}")
                         Text(text = "Child Username: ${settingsViewmodel.editingChild.username}")
-                        Text(text = "Completed Levels: ${settingsViewmodel.editingChild.listLevels.size}")
+                        Text(text = "Completed Levels: ${kidLevels.size}")
                     }
 
                     Row(
-                        modifier = Modifier.fillMaxWidth()
-                        , horizontalArrangement = Arrangement.SpaceBetween
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Button(
                             onClick = {
-                                settingsViewmodel.isEditingChild.value = !settingsViewmodel.isEditingChild.value
-                            }
-                            , shape = MaterialTheme.shapes.extraSmall
+                                //settingsViewmodel.isEditingChild.value = !settingsViewmodel.isEditingChild.value
+                                settingsViewmodel.isEditingChild = false
+
+                            }, shape = MaterialTheme.shapes.extraSmall
                         ) {
                             Text(text = "Cancel")
                         }
 
                         Button(
                             onClick = {
-                                scope.launch { settingsViewmodel.removeChild() }
-                            }
-                            , shape = MaterialTheme.shapes.extraSmall
+                                settingsViewmodel.isEditingChild = false
+                                settingsViewmodel.removeChild()
+                                //scope.launch { settingsViewmodel.removeChild() }
+                            }, shape = MaterialTheme.shapes.extraSmall
                         ) {
                             Text(text = "Remove")
                         }

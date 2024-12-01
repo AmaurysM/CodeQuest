@@ -175,7 +175,6 @@ class LevelViewmodel : ViewModel() {
     suspend fun playButton(navController: NavHostController) {
         val chosenDirection = usableTopBarItems()
         val turnsInLevel = locationOfTurnsAndFlag(gameState.path)
-        /*Log.e("LevelViewmodel", "turnsInLevel: $turnsInLevel")*/
         isAnimating = true
         val scope = CoroutineScope(coroutineContext)
 
@@ -215,7 +214,7 @@ class LevelViewmodel : ViewModel() {
                     withContext(Dispatchers.Main) {
                         launch {
                             navController.navigate(Screens.GameChild.LevelSelect.route)
-                            LevelController.getLevel().isCompleted = true
+                            LevelController.getLevel().completed = true
                             FireBaseController.saveLevels()
                         }
                     }

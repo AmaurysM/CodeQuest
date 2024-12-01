@@ -1,8 +1,6 @@
 package com.amaurysdm.codequest
 
-import android.app.Activity
 import android.content.pm.ActivityInfo
-import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,8 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.amaurysdm.codequest.navigation.CodeQuestNavHost
 import com.amaurysdm.codequest.ui.theme.CodeQuestTheme

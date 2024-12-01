@@ -129,7 +129,8 @@ fun SettingsView(
                         }
                     }
 
-                    Button(onClick = { settingsViewmodel.isAddingChild = true },
+                    Button(
+                        onClick = { settingsViewmodel.isAddingChild = true },
                         shape = MaterialTheme.shapes.extraSmall
                     ) {
                         Text(text = "Add Child")
@@ -143,7 +144,8 @@ fun SettingsView(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Button(onClick = { settingsViewmodel.back(navController) },
+                Button(
+                    onClick = { settingsViewmodel.back(navController) },
                     shape = MaterialTheme.shapes.extraSmall
                 ) {
                     Text(text = "Back")
@@ -164,7 +166,8 @@ fun SettingsView(
                     )
                 }
 
-                Button(onClick = { settingsViewmodel.logout(navController) },
+                Button(
+                    onClick = { settingsViewmodel.logout(navController) },
                     shape = MaterialTheme.shapes.extraSmall
                 ) {
                     Text(text = "Logout")

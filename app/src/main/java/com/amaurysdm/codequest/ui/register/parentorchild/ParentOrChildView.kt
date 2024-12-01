@@ -90,7 +90,8 @@ fun ParentOrChildView(
                         modifier = Modifier.size(150.dp)
                     )
 
-                    Button(onClick = { parentOrChildViewmodel.goToChild(navController) },
+                    Button(
+                        onClick = { parentOrChildViewmodel.goToChild(navController) },
                         shape = MaterialTheme.shapes.extraSmall
                     ) {
                         Text(text = "I am a child")
@@ -115,7 +116,8 @@ fun ParentOrChildView(
                         modifier = Modifier.size(150.dp)
                     )
 
-                    Button(onClick = { parentOrChildViewmodel.goToParent(navController) },
+                    Button(
+                        onClick = { parentOrChildViewmodel.goToParent(navController) },
                         shape = MaterialTheme.shapes.extraSmall
                     ) {
                         Text(text = "I am a parent")

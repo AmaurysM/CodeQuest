@@ -55,6 +55,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -78,7 +79,8 @@ fun LevelView(
     levelViewModel: LevelViewmodel = viewModel()
 ) {
     val coroutineScope = rememberCoroutineScope()
-
+    val contex = LocalContext.current
+    //val mMediaPlayer = MediaPlayer.create(contex, R.raw.speedsound)
 
 
     Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
@@ -86,8 +88,12 @@ fun LevelView(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.15f)
+                .background(Color(0xFF9eb50d))
+                .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
                 .background(MaterialTheme.colorScheme.primary)
-                .padding(10.dp), horizontalArrangement = Arrangement.SpaceBetween
+                .padding(10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
 
             Row(
@@ -147,9 +153,14 @@ fun LevelView(
                         enabled = !levelViewModel.isAnimating
                     ) {
                         levelViewModel.isAnimating = true
-                        coroutineScope.launch(Dispatchers.IO) {
-                            levelViewModel.playButton(navController)
-                        }
+                        coroutineScope
+                            .launch(Dispatchers.IO) {
+                                levelViewModel.playButton(navController)
+                            }
+                            .invokeOnCompletion {
+                                levelViewModel.isAnimating = false
+                            }
+                        //mMediaPlayer.start()
                     }
 
             ) {
@@ -157,92 +168,119 @@ fun LevelView(
             }
         }
     }, topBar = {
-
         Row(
             modifier = Modifier
-                .fillMaxWidth()
+                .background(Color(0xFF9eb50d))
+                .clip(RoundedCornerShape(bottomStart = 10.dp, bottomEnd = 10.dp))
                 .background(MaterialTheme.colorScheme.secondary)
-                .padding(10.dp)
-                .horizontalScroll(
-                    state = rememberScrollState(),
-                    enabled = true,
-                    flingBehavior = null,
-                )
+                .padding(top = 20.dp, bottom = 10.dp, start = 10.dp, end = 10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+
         ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.1f)
+                    .size(100.dp)
 
-            levelViewModel.topBarItems.forEachIndexed { index, _ ->
+                    .clip(RoundedCornerShape(100.dp))
+                    .background(MaterialTheme.colorScheme.primary)
+                    .padding(10.dp)
+                    .clickable {
+                        levelViewModel.back(navController)
+                    }
+            ) {
+                CreateText("<", modifier = Modifier.align(Alignment.Center))
+            }
+            Row(
+                modifier = Modifier
+                    //.fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.secondary)
+                    //.padding(10.dp)
+                    .horizontalScroll(
+                        state = rememberScrollState(),
+                        enabled = true,
+                        flingBehavior = null,
+                    ),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
 
-                Box(
-                    modifier = modifier
-                        .size(90.dp)
-                        .padding(10.dp)
-                        .background(MaterialTheme.colorScheme.primary)
-                        .border(BorderStroke(1.dp, Color.Black))
-                        .dragAndDropTarget(
-                            shouldStartDragAndDrop = { event ->
-                                event
-                                    .mimeTypes()
-                                    .contains(ClipDescription.MIMETYPE_TEXT_PLAIN)
-                            },
-                            target = remember {
-                                object : DragAndDropTarget {
-                                    override fun onDrop(event: DragAndDropEvent): Boolean {
 
-                                        levelViewModel.topBarItems[index] =
-                                            levelViewModel.draggingItem
-                                        levelViewModel.draggingItem = TopBarItem()
+                levelViewModel.topBarItems.forEachIndexed { index, _ ->
 
-                                        if (levelViewModel.clickedItem == levelViewModel.topBarItems[index]) {
-                                            levelViewModel.clickedItem = TopBarItem()
-                                        } else levelViewModel.clickedItem =
-                                            levelViewModel.topBarItems[index]
+                    Box(
+                        modifier = Modifier
+                            .size(90.dp)
+                            .padding(10.dp)
+                            .background(MaterialTheme.colorScheme.primary)
+                            .border(BorderStroke(1.dp, Color.Black))
+                            .dragAndDropTarget(
+                                shouldStartDragAndDrop = { event ->
+                                    event
+                                        .mimeTypes()
+                                        .contains(ClipDescription.MIMETYPE_TEXT_PLAIN)
+                                },
+                                target = remember {
+                                    object : DragAndDropTarget {
+                                        override fun onDrop(event: DragAndDropEvent): Boolean {
 
-                                        return true
-                                    }
-                                }
-                            }
-                        )
+                                            levelViewModel.topBarItems[index] =
+                                                levelViewModel.draggingItem
+                                            levelViewModel.draggingItem = TopBarItem()
 
-                )
-                {
-
-                    this@Row.AnimatedVisibility(
-                        visible = levelViewModel.topBarItems[index].isVisible.value,
-                        enter = scaleIn() + fadeIn(),
-                        exit = scaleOut() + fadeOut()
-                    ) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(
-                                id = levelViewModel.topBarItems[index].direction.value.icon
-                            ), contentDescription = null, modifier = Modifier
-                                .fillMaxSize()
-                                .dragAndDropSource {
-                                    detectTapGestures(
-                                        onLongPress = { _ ->
-
-                                            levelViewModel.draggingItem =
-                                                levelViewModel.topBarItems[index]
-                                            levelViewModel.topBarItems[index] = TopBarItem()
-
-                                            startTransfer(
-                                                transferData = DragAndDropTransferData(
-                                                    clipData = ClipData.newPlainText(
-                                                        "text",
-                                                        ""
-                                                    )
-                                                )
-                                            )
-                                        },
-                                        onTap = {
                                             if (levelViewModel.clickedItem == levelViewModel.topBarItems[index]) {
                                                 levelViewModel.clickedItem = TopBarItem()
                                             } else levelViewModel.clickedItem =
                                                 levelViewModel.topBarItems[index]
-                                        }
-                                    )
-                                }
 
-                        )
+                                            return true
+                                        }
+                                    }
+                                }
+                            )
+
+                    )
+                    {
+
+                        this@Row.AnimatedVisibility(
+                            visible = levelViewModel.topBarItems[index].isVisible.value,
+                            enter = scaleIn() + fadeIn(),
+                            exit = scaleOut() + fadeOut()
+                        ) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(
+                                    id = levelViewModel.topBarItems[index].direction.value.icon
+                                ), contentDescription = null, modifier = Modifier
+                                    .fillMaxSize()
+                                    .dragAndDropSource {
+                                        detectTapGestures(
+                                            onLongPress = { _ ->
+
+                                                levelViewModel.draggingItem =
+                                                    levelViewModel.topBarItems[index]
+                                                levelViewModel.topBarItems[index] = TopBarItem()
+
+                                                startTransfer(
+                                                    transferData = DragAndDropTransferData(
+                                                        clipData = ClipData.newPlainText(
+                                                            "text",
+                                                            ""
+                                                        )
+                                                    )
+                                                )
+                                            },
+                                            onTap = {
+                                                if (levelViewModel.clickedItem == levelViewModel.topBarItems[index]) {
+                                                    levelViewModel.clickedItem = TopBarItem()
+                                                } else levelViewModel.clickedItem =
+                                                    levelViewModel.topBarItems[index]
+                                            }
+                                        )
+                                    }
+
+                            )
+                        }
                     }
                 }
             }
@@ -251,7 +289,7 @@ fun LevelView(
     ) { paddingValues ->
         Box(
             modifier = Modifier
-                //.padding(vertical = paddingValues.calculateTopPadding())
+                .padding(vertical = paddingValues.calculateTopPadding())
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
                         change.consume()
@@ -357,7 +395,8 @@ fun LevelView(
                 ) {
                     Row(
                         modifier = Modifier
-                            .background(Color.Red)
+                            .clip(RoundedCornerShape(bottomStart = 10.dp))
+                            .background(MaterialTheme.colorScheme.secondary)
                             .align(Alignment.TopEnd),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically

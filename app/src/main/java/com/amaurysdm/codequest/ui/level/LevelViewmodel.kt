@@ -1,5 +1,7 @@
 package com.amaurysdm.codequest.ui.level
 
+import android.content.Context
+import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -13,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
+import com.amaurysdm.codequest.R
 import com.amaurysdm.codequest.model.Directions
 import com.amaurysdm.codequest.model.FireBaseController
 import com.amaurysdm.codequest.model.GameState
@@ -52,6 +55,8 @@ class LevelViewmodel : ViewModel() {
 
     var topBarItems = mutableStateListOf<TopBarItem>()
     var bottomBarItems = mutableListOf<Directions>()
+
+    /*val mMediaPlayer = MediaPlayer.create(coroutineContext, R.raw.speedsound)*/
 
 
     init {
@@ -175,8 +180,8 @@ class LevelViewmodel : ViewModel() {
     suspend fun playButton(navController: NavHostController) {
         val chosenDirection = usableTopBarItems()
         val turnsInLevel = locationOfTurnsAndFlag(gameState.path)
-        isAnimating = true
         val scope = CoroutineScope(coroutineContext)
+
 
         while (isAnimating) {
             delay(150)
@@ -187,7 +192,11 @@ class LevelViewmodel : ViewModel() {
             }
 
             if (validMove(chosenDirection[currentMove].direction.value)) {
+
+
                 scope.launch {
+                    val mediaPlayer = MediaPlayer.create(navController.context, R.raw.speedsound)
+                    mediaPlayer.start()
                     if (chosenDirection[currentMove].direction.value.movement.first == 0) {
                         animatableY.animateTo(
                             targetValue = turnsInLevel[currentMove].second.toFloat(),
@@ -199,7 +208,9 @@ class LevelViewmodel : ViewModel() {
                             animationSpec = tween(durationMillis = 500)
                         )
                     }
+                    mediaPlayer.release()
                 }.join()
+
 
                 gameState = gameState.copy(
                     playerPosition = Pair(
@@ -228,21 +239,31 @@ class LevelViewmodel : ViewModel() {
         }
         delay(500)
         resetAnimation()
-        resetPosition()
+        resetPosition(navController.context)
     }
 
     private fun resetAnimation() {
-        isAnimating = false
         currentMove = 0
     }
 
-    private suspend fun resetPosition() {
+    private suspend fun resetPosition(context: Context) {
+        val mediaPlayer = MediaPlayer.create(context, R.raw.speedsound)
         gameState = gameState.copy(playerPosition = startLocation)
-
+        mediaPlayer.start()
         animatableX.animateTo(startLocation.first.toFloat())
         animatableY.animateTo(startLocation.second.toFloat())
+        mediaPlayer.release()
 
-        isAnimating = false
+
+    }
+
+    fun back(navController: NavHostController) {
+        navController.navigate(Screens.GameChild.LevelSelect.route) {
+            popUpTo(Screens.GameChild.LevelSelect.route) {
+                inclusive = true
+            }
+        }
+
     }
 
 }

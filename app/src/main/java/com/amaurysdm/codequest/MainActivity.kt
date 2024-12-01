@@ -1,6 +1,7 @@
 package com.amaurysdm.codequest
 
 import android.content.pm.ActivityInfo
+import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,7 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.amaurysdm.codequest.navigation.CodeQuestNavHost
 import com.amaurysdm.codequest.ui.theme.CodeQuestTheme
@@ -30,6 +33,14 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun CodeQuestApp() {
+    val context = LocalContext.current
+    val soundManager = MediaPlayer.create(context, R.raw.outdoors)
+    DisposableEffect(Unit) {
+        soundManager.start()
+        onDispose {
+            soundManager.release()
+        }
+    }
     CodeQuestTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             CodeQuestNavHost(

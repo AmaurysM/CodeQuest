@@ -2,6 +2,7 @@ package com.amaurysdm.codequest.ui.settings
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,17 +11,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -33,6 +41,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.amaurysdm.codequest.R
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun SettingsView(
@@ -40,7 +49,9 @@ fun SettingsView(
     settingsViewmodel: SettingsViewmodel = viewModel()
 ) {
 
-    val isAddingChild = remember { mutableStateOf(false)}
+    val kids by settingsViewmodel.childrenFlow.collectAsState(emptyList())
+    val kidLevels by settingsViewmodel.editingChildLevelsFlow.collectAsState(emptyList())
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -52,7 +63,7 @@ fun SettingsView(
             contentScale = ContentScale.FillHeight
         )
 
-        Box(
+        Column(
             modifier = Modifier
                 .align(Alignment.Center)
                 .fillMaxWidth()
@@ -60,6 +71,8 @@ fun SettingsView(
                 .clip(MaterialTheme.shapes.small)
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
 
             Box(
@@ -79,24 +92,45 @@ fun SettingsView(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(10.dp)
-            ){
+            ) {
                 Text(text = "Username: ${settingsViewmodel.user.username}")
                 Text(text = "Email: ${settingsViewmodel.user.email}")
             }
 
-            if(settingsViewmodel.areYouAParent()) {
+            if (settingsViewmodel.dropDownActive) {
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                        .background(MaterialTheme.colorScheme.surface)
+                        .verticalScroll(state = rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceBetween
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Column {
-                        settingsViewmodel.children.forEach {
-                            Text(text = it)
+                        kids.forEach {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(10.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(text = it.email)
+                                Icon(imageVector = ImageVector.vectorResource(id = R.drawable.baseline_edit_24),
+                                    contentDescription = null,
+                                    modifier = Modifier.clickable {
+                                        settingsViewmodel.isEditingChild = true
+                                        settingsViewmodel.observeChildLevels(it)
+
+                                    })
+
+                            }
                         }
                     }
-                    Button(onClick = {
-                        isAddingChild.value = !isAddingChild.value }
+
+                    Button(onClick = { settingsViewmodel.isAddingChild = true },
+                        shape = MaterialTheme.shapes.extraSmall
                     ) {
                         Text(text = "Add Child")
                     }
@@ -104,28 +138,163 @@ fun SettingsView(
                 }
             }
 
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
-            ){
-                Button(onClick = { settingsViewmodel.back(navController) }) {
+            ) {
+                Button(onClick = { settingsViewmodel.back(navController) },
+                    shape = MaterialTheme.shapes.extraSmall
+                ) {
                     Text(text = "Back")
                 }
-                Button(onClick = { settingsViewmodel.logout(navController) }) {
+
+                if (settingsViewmodel.isParent) {
+                    Icon(imageVector =
+                    if (!settingsViewmodel.dropDownActive)
+                        Icons.Filled.KeyboardArrowDown
+                    else
+                        Icons.Filled.KeyboardArrowUp,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .clickable {
+                                settingsViewmodel.dropDownActive = !settingsViewmodel.dropDownActive
+                            }
+                            .size(30.dp)
+                    )
+                }
+
+                Button(onClick = { settingsViewmodel.logout(navController) },
+                    shape = MaterialTheme.shapes.extraSmall
+                ) {
                     Text(text = "Logout")
                 }
             }
         }
 
-        if(isAddingChild.value) {
-/*            Column {
-                Text(text = "Add Child")
-                OutlinedTextField(
-                    value = settingsViewmodel.childName,
-                    onValueChange = { settingsViewmodel.childName = it },
-                    label = { Text("Child Name") }
-                )
-            }*/
+        if (settingsViewmodel.isAddingChild) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f))
+                    .clickable {
+                        ; // Do nothing
+                    }
+            ) {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .fillMaxWidth()
+                        .padding(40.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Text(text = "Add Child")
+
+
+                    Column {
+                        OutlinedTextField(
+                            value = settingsViewmodel.newChild.email,
+                            onValueChange = {
+                                settingsViewmodel.newChild =
+                                    settingsViewmodel.newChild.copy(email = it)
+                            },
+                            label = { Text(text = "Child Email") }
+                        )
+                    }
+
+                    Row {
+                        Button(
+                            onClick = {
+                                //settingsViewmodel.isAddingChild.value = !settingsViewmodel.isAddingChild.value
+                                settingsViewmodel.isAddingChild = false
+                                //settingsViewmodel.addChild()
+                            }
+                        ) {
+                            Text(text = "Cancel")
+                        }
+
+                        Button(onClick = {
+                            settingsViewmodel.isAddingChild = false
+                            settingsViewmodel.addChild()
+
+                            //scope.launch { settingsViewmodel.addChild() }
+                        }
+                        ) {
+                            Text(text = "Add")
+                        }
+                    }
+
+
+                }
+
+            }
+
+        }
+
+        if (settingsViewmodel.isEditingChild) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f))
+                    .clickable {
+                        ; // Do nothing
+                    }
+            ) {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .fillMaxWidth()
+                        .padding(40.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Text(text = "Child Info")
+
+
+                    Column {
+                        Text(text = "Child Email: ${settingsViewmodel.editingChild.email}")
+                        Text(text = "Child Username: ${settingsViewmodel.editingChild.username}")
+                        Text(text = "Completed Levels: ${kidLevels.size}")
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Button(
+                            onClick = {
+                                //settingsViewmodel.isEditingChild.value = !settingsViewmodel.isEditingChild.value
+                                settingsViewmodel.isEditingChild = false
+
+                            }, shape = MaterialTheme.shapes.extraSmall
+                        ) {
+                            Text(text = "Cancel")
+                        }
+
+                        Button(
+                            onClick = {
+                                settingsViewmodel.isEditingChild = false
+                                settingsViewmodel.removeChild()
+                                //scope.launch { settingsViewmodel.removeChild() }
+                            }, shape = MaterialTheme.shapes.extraSmall
+                        ) {
+                            Text(text = "Remove")
+                        }
+                    }
+
+
+                }
+
+            }
         }
 
     }

@@ -64,7 +64,7 @@ fun LevelSelectView(
                     style = MaterialTheme.typography.headlineLarge,
                     textSize = 80f,
                     outlineWidth = 20f,
-                    modifier = modifier.padding(bottom = 10.dp)
+                    modifier = Modifier.padding(bottom = 10.dp)
                 )
 
                 LazyVerticalGrid(
@@ -79,7 +79,7 @@ fun LevelSelectView(
                                 .padding(10.dp)
                                 .clip(MaterialTheme.shapes.medium)
                                 .border(15.dp, MaterialTheme.colorScheme.primary)
-                                .background(if (levelSelectViewModel.getLevel(it).isCompleted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.background)
+                                .background(if (levelSelectViewModel.getLevel(it).completed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.background)
                                 .clickable {
                                     levelSelectViewModel.navigateToLevel(navController, it)
                                 }
@@ -90,7 +90,7 @@ fun LevelSelectView(
                                 style = MaterialTheme.typography.headlineLarge,
                                 textSize = 80f,
                                 outlineWidth = 20f,
-                                modifier = modifier.align(Alignment.Center)
+                                modifier = Modifier.align(Alignment.Center)
                             )
                         }
 

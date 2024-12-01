@@ -1,5 +1,6 @@
 package com.amaurysdm.codequest
 
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,9 +15,11 @@ import com.amaurysdm.codequest.navigation.CodeQuestNavHost
 import com.amaurysdm.codequest.ui.theme.CodeQuestTheme
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContent {
 
             CodeQuestApp()
@@ -27,14 +30,12 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun CodeQuestApp() {
-
     CodeQuestTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             CodeQuestNavHost(
                 modifier = Modifier.padding(innerPadding)
             )
         }
-
     }
 }
 

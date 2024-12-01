@@ -9,7 +9,6 @@ import androidx.navigation.NavHostController
 import com.amaurysdm.codequest.model.FireBaseController
 import com.amaurysdm.codequest.model.RegisterData
 import com.amaurysdm.codequest.navigation.Screens
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.cancel
 
 class RegisterViewmodel : ViewModel() {

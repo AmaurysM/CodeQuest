@@ -5,11 +5,11 @@ import androidx.navigation.NavHostController
 import com.amaurysdm.codequest.navigation.Screens
 import com.amaurysdm.codequest.ui.register.SharedRegisterViewmodel
 
-class ParentOrChildViewmodel: ViewModel() {
+class ParentOrChildViewmodel : ViewModel() {
     fun goToChild(navController: NavHostController) {
         SharedRegisterViewmodel.userBeingCreated.isAParent = false
-        navController.navigate(Screens.UserCreationChild.Register.route){
-            popUpTo(Screens.UserCreationChild.ParentOrChild.route){
+        navController.navigate(Screens.UserCreationChild.Register.route) {
+            popUpTo(Screens.UserCreationChild.ParentOrChild.route) {
                 inclusive = true
             }
         }
@@ -17,8 +17,8 @@ class ParentOrChildViewmodel: ViewModel() {
 
     fun goToParent(navController: NavHostController) {
         SharedRegisterViewmodel.userBeingCreated.isAParent = true
-        navController.navigate(Screens.UserCreationChild.Register.route){
-            popUpTo(Screens.UserCreationChild.ParentOrChild.route){
+        navController.navigate(Screens.UserCreationChild.Register.route) {
+            popUpTo(Screens.UserCreationChild.ParentOrChild.route) {
                 inclusive = true
             }
         }

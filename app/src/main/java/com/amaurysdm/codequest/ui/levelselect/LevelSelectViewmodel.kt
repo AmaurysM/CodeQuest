@@ -11,7 +11,7 @@ class LevelSelectViewmodel : ViewModel() {
     var levels = LevelController.levels.value.size
 
     fun getLevelsCompletedByUser(): List<Level> {
-        return LevelController.levels.value.filter { it.isCompleted }
+        return LevelController.levels.value.filter { it.completed }
     }
 
     fun getLevel(it: Int): Level {

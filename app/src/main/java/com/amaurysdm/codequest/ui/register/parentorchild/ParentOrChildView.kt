@@ -77,8 +77,8 @@ fun ParentOrChildView(
 
                 Column(
                     modifier = Modifier
-                        .clip(MaterialTheme.shapes.extraSmall)
                         .padding(vertical = 10.dp)
+                        .clip(MaterialTheme.shapes.extraSmall)
                         .background(Color(0x88a1ba06))
                         .padding(vertical = 10.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -103,8 +103,8 @@ fun ParentOrChildView(
 
                 Column(
                     modifier = Modifier
-                        .clip(MaterialTheme.shapes.extraSmall)
                         .padding(vertical = 10.dp)
+                        .clip(MaterialTheme.shapes.extraSmall)
                         .background(Color(0x88a1ba06))
                         .padding(vertical = 10.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,

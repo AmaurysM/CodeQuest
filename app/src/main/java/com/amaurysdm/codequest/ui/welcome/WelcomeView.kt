@@ -57,7 +57,7 @@ fun WelcomeView(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-
+                // Custom composable for the title
                 CreateText(
                     text = "CodeQuest",
                     textColor = MaterialTheme.colorScheme.onPrimaryContainer,

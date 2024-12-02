@@ -2,8 +2,8 @@ package com.amaurysdm.codequest.ui.levelselect
 
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
+import com.amaurysdm.codequest.controllers.LevelController
 import com.amaurysdm.codequest.model.Level
-import com.amaurysdm.codequest.model.LevelController
 import com.amaurysdm.codequest.navigation.Screens
 
 class LevelSelectViewmodel : ViewModel() {

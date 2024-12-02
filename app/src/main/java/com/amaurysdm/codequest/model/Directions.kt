@@ -2,6 +2,7 @@ package com.amaurysdm.codequest.model
 
 import com.amaurysdm.codequest.R
 
+// Sealed class for the directions, it has the direction, the icon and the movement
 sealed class Directions(
     open val direction: Char,
     open val icon: Int,
@@ -25,9 +26,3 @@ val movableDirections = mutableListOf<Directions>(
     Directions.Repeat
 )
 
-val directions = mutableListOf<Directions>(
-    Directions.Up,
-    Directions.Down,
-    Directions.Left,
-    Directions.Right,
-)

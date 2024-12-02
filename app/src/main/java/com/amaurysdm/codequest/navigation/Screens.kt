@@ -1,5 +1,7 @@
 package com.amaurysdm.codequest.navigation
 
+// Trying something new.
+// Don't know if I should separate the screens or not.
 sealed class Screens(val route: String) {
     // Splash
     data object Splash : Screens("splash")

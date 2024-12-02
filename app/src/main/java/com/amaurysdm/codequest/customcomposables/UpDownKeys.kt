@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.amaurysdm.codequest.R
 
+// Composable for the up and down keys
 @Preview(showBackground = true)
 @Composable
 fun UpDownKeys(

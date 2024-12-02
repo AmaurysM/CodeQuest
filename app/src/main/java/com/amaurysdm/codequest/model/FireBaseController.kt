@@ -75,6 +75,7 @@ object FireBaseController {
                     if (it.isSuccessful) {
                         onLogin()
                     }
+                    getUserData()
                 }
 
         }

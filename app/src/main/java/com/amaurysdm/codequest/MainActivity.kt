@@ -36,6 +36,7 @@ fun CodeQuestApp() {
     val context = LocalContext.current
     val soundManager = MediaPlayer.create(context, R.raw.outdoors)
     DisposableEffect(Unit) {
+        soundManager.isLooping = true
         soundManager.start()
         onDispose {
             soundManager.release()

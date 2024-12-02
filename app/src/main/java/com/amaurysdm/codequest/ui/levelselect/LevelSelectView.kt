@@ -60,7 +60,7 @@ fun LevelSelectView(
             ) {
                 CreateText(
                     text = "Level Select",
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    textColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = MaterialTheme.typography.headlineLarge,
                     textSize = 80f,
                     outlineWidth = 20f,
@@ -86,7 +86,7 @@ fun LevelSelectView(
                         ) {
                             CreateText(
                                 text = (it + 1).toString(),
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                textColor = MaterialTheme.colorScheme.onPrimaryContainer,
                                 style = MaterialTheme.typography.headlineLarge,
                                 textSize = 80f,
                                 outlineWidth = 20f,

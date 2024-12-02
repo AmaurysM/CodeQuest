@@ -51,6 +51,7 @@ fun SettingsView(
 
     val kids by settingsViewmodel.childrenFlow.collectAsState(emptyList())
     val kidLevels by settingsViewmodel.editingChildLevelsFlow.collectAsState(emptyList())
+    val myLevels by settingsViewmodel.levelsFlow.collectAsState(emptyList())
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -95,6 +96,7 @@ fun SettingsView(
             ) {
                 Text(text = "Username: ${settingsViewmodel.user.username}")
                 Text(text = "Email: ${settingsViewmodel.user.email}")
+                Text(text = "Levels Completed: ${myLevels.size}")
             }
 
             if (settingsViewmodel.dropDownActive) {
@@ -213,9 +215,7 @@ fun SettingsView(
                     Row {
                         Button(
                             onClick = {
-                                //settingsViewmodel.isAddingChild.value = !settingsViewmodel.isAddingChild.value
                                 settingsViewmodel.isAddingChild = false
-                                //settingsViewmodel.addChild()
                             }
                         ) {
                             Text(text = "Cancel")
@@ -224,8 +224,6 @@ fun SettingsView(
                         Button(onClick = {
                             settingsViewmodel.isAddingChild = false
                             settingsViewmodel.addChild()
-
-                            //scope.launch { settingsViewmodel.addChild() }
                         }
                         ) {
                             Text(text = "Add")
@@ -275,7 +273,6 @@ fun SettingsView(
                     ) {
                         Button(
                             onClick = {
-                                //settingsViewmodel.isEditingChild.value = !settingsViewmodel.isEditingChild.value
                                 settingsViewmodel.isEditingChild = false
 
                             }, shape = MaterialTheme.shapes.extraSmall
@@ -287,7 +284,6 @@ fun SettingsView(
                             onClick = {
                                 settingsViewmodel.isEditingChild = false
                                 settingsViewmodel.removeChild()
-                                //scope.launch { settingsViewmodel.removeChild() }
                             }, shape = MaterialTheme.shapes.extraSmall
                         ) {
                             Text(text = "Remove")

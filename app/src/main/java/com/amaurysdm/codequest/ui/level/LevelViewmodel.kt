@@ -182,7 +182,6 @@ class LevelViewmodel : ViewModel() {
         val turnsInLevel = locationOfTurnsAndFlag(gameState.path)
         val scope = CoroutineScope(coroutineContext)
 
-
         while (isAnimating) {
             delay(150)
             if (chosenDirection.isEmpty()) break
@@ -193,9 +192,8 @@ class LevelViewmodel : ViewModel() {
 
             if (validMove(chosenDirection[currentMove].direction.value)) {
 
-
                 scope.launch {
-                    val mediaPlayer = MediaPlayer.create(navController.context, R.raw.speedsound)
+                    val mediaPlayer = MediaPlayer.create(navController.context, R.raw.speedsoundcut)
                     mediaPlayer.start()
                     if (chosenDirection[currentMove].direction.value.movement.first == 0) {
                         animatableY.animateTo(
@@ -219,22 +217,22 @@ class LevelViewmodel : ViewModel() {
                     )
                 )
 
-            } else {
-                currentMove++
-                if (gameState.playerPosition == gameState.path.last()) {
-                    withContext(Dispatchers.Main) {
-                        launch {
-                            navController.navigate(Screens.GameChild.LevelSelect.route)
-                            LevelController.getLevel().completed = true
-                            FireBaseController.saveLevels()
-                        }
+            }
+            if (gameState.playerPosition == gameState.path.last()) {
+                withContext(Dispatchers.Main) {
+                    launch {
+                        navController.navigate(Screens.GameChild.LevelSelect.route)
+                        LevelController.getLevel().completed = true
+                        FireBaseController.saveLevels()
                     }
-
-                    resetAnimation()
-                    return
                 }
 
+                resetAnimation()
+                return
             }
+
+
+            currentMove++
 
         }
         delay(500)

@@ -17,10 +17,11 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun CreateText(
     text: String = "Amaurys",
-    color: Color = MaterialTheme.colorScheme.onPrimary,
+    textColor: Color = MaterialTheme.colorScheme.onPrimary,
     style: TextStyle = MaterialTheme.typography.headlineLarge,
     textSize: Float = 100f,
     outlineWidth: Float = 20f,
+    outlineColor: Color = MaterialTheme.colorScheme.primary,
     modifier: Modifier = Modifier,
     bobbing: Float = 0f,
     rotation: Float = 0f
@@ -31,11 +32,11 @@ fun CreateText(
         this.textSize = textSize
         this.style = android.graphics.Paint.Style.STROKE
         this.strokeWidth = outlineWidth
-        this.color = MaterialTheme.colorScheme.primary.toArgb()
+        this.color = outlineColor.toArgb()
     }
 
     val fillPaint = android.graphics.Paint().apply {
-        this.color = MaterialTheme.colorScheme.onPrimary.toArgb()
+        this.color = textColor.toArgb()
         this.textSize = textSize
         this.style = android.graphics.Paint.Style.FILL
 

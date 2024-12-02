@@ -60,7 +60,7 @@ fun WelcomeView(
 
                 CreateText(
                     text = "CodeQuest",
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    textColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = MaterialTheme.typography.headlineLarge,
                     textSize = 180f,
                     outlineWidth = 110f,

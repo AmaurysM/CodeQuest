@@ -8,6 +8,7 @@ import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.runtime.Composable
 
+// Animation for the title
 @Composable
 fun TitleAnimation(): Pair<Float, Float> {
     val infiniteTransition = rememberInfiniteTransition(label = "")
@@ -19,9 +20,9 @@ fun TitleAnimation(): Pair<Float, Float> {
         animationSpec = infiniteRepeatable(
             animation = keyframes {
                 durationMillis = 2000
-                -15f at 0 using LinearOutSlowInEasing
+                (-15f) at 0 using LinearOutSlowInEasing
                 15f at 1000 using LinearOutSlowInEasing
-                -15f at 2000 using LinearOutSlowInEasing
+                (-15f) at 2000 using LinearOutSlowInEasing
             }
         )
     )
@@ -39,7 +40,7 @@ fun TitleAnimation(): Pair<Float, Float> {
                 50f at 4000
             }
         )
-    )/* */
+    )
 
     return Pair(bobbing.value, rotation.value)
 

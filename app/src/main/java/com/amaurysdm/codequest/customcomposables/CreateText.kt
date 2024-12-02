@@ -13,6 +13,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
+// Creates a text with a with a border
 @Preview(showBackground = true)
 @Composable
 fun CreateText(

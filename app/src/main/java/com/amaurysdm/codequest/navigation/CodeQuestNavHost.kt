@@ -18,7 +18,7 @@ import com.amaurysdm.codequest.ui.settings.SettingsView
 import com.amaurysdm.codequest.ui.splash.SplashView
 import com.amaurysdm.codequest.ui.welcome.WelcomeView
 
-
+// Navigation controller
 @Composable
 fun CodeQuestNavHost(
     navController: NavHostController = rememberNavController(),

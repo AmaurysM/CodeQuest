@@ -1,6 +1,10 @@
-package com.amaurysdm.codequest.model
+package com.amaurysdm.codequest.controllers
 
-import android.util.Log
+import com.amaurysdm.codequest.model.Level
+import com.amaurysdm.codequest.model.LevelsCompletedData
+import com.amaurysdm.codequest.model.LoginData
+import com.amaurysdm.codequest.model.RegisterData
+import com.amaurysdm.codequest.model.User
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
@@ -15,7 +19,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-
+// Firebase Controller, controls the firebase database
 object FireBaseController {
     val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
@@ -34,6 +38,11 @@ object FireBaseController {
 
     }
 
+    // gets the user data from firebase
+    // gets the levels that the user has completed from firebase
+    // But theres an error here. More like something I could have done better.
+    // The instance of the firebase datastore that I have is not being updated live
+    // do when I add a user you con only see the updated information after restarting the app.
     fun getUserData() {
         val db = Firebase.firestore
         val userId = auth.currentUser?.uid ?: ""
@@ -68,6 +77,8 @@ object FireBaseController {
 
     }
 
+    // logs in the user to firebase
+    // don't know if it would be better to have this in the loginViewmodel
     fun login(loginData: LoginData, onLogin: () -> Unit) {
         loginJob.launch {
             auth.signInWithEmailAndPassword(loginData.email, loginData.password)
@@ -81,6 +92,7 @@ object FireBaseController {
         }
     }
 
+    // registers the user to firebase
     fun register(registerData: RegisterData, onRegister: () -> Unit) {
         registerJob.launch {
             auth.createUserWithEmailAndPassword(registerData.email, registerData.password)
@@ -96,6 +108,7 @@ object FireBaseController {
         }
     }
 
+    // saves the user data to firebase
     fun saveUserData(registerData: RegisterData) {
         val database = Firebase.firestore
         val user = User(
@@ -111,6 +124,7 @@ object FireBaseController {
 
     }
 
+    // saves the levels that the user has completed to firebase
     fun saveLevels() {
         val db = Firebase.firestore
         val userId = auth.currentUser?.uid ?: ""
@@ -140,6 +154,7 @@ object FireBaseController {
 
     }
 
+    // gets the user data from firebase
     fun getUserCurrentUserData(): User {
         val db = Firebase.firestore
         val userId = auth.currentUser?.uid ?: ""
@@ -158,10 +173,12 @@ object FireBaseController {
         return user
     }
 
+    // checks if the user is logged in or not.
+    // Navigates accordingly.
     suspend fun beginningDestination(whenLoggedIn: () -> Unit, whenNotLoggedIn: () -> Unit) {
         var isLoggedIn = false
 
-        val checkLoginJob = GlobalScope.launch {
+        val checkLoginJob = coroutineScope.launch {
             isLoggedIn = auth.currentUser != null
         }
 
@@ -177,21 +194,21 @@ object FireBaseController {
         }
     }
 
+    // gets the user data from firebase
     suspend fun getUser(userID: String): User {
 
         val db = Firebase.firestore
-        val userRef = db.collection("user").document(userID)
+        val userRef = db.collection("user").document(userID) // gets the document of the user
         return suspendCoroutine { continuation ->
             userRef.get().addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val user = User(
+                if (document.exists()) { // if the document exists
+                    val user = User( // creates a new user object from the data in the document
                         userId = document["userId"] as String,
                         username = document["username"] as String,
                         email = document["email"] as String,
                         children = document["children"] as? List<String> ?: emptyList()
                     )
-                    Log.e("TAG", "getUser: $user")
-                    continuation.resume(user)
+                    continuation.resume(user) // resumes the coroutine with the user object
                 } else {
                     continuation.resume(User())
                 }
@@ -202,6 +219,8 @@ object FireBaseController {
 
     }
 
+    // gets the user data from firebase using an email.
+    // I'm using an email and password to create users so emails are all unique.
     suspend fun getUserFromEmail(email: String): User? {
         val db = Firebase.firestore
         val usersRef = db.collection("user").whereEqualTo("email", email)
@@ -221,6 +240,7 @@ object FireBaseController {
 
     }
 
+    // gets the levels that the user has completed from firebase using the user id
     suspend fun getCompletedLevelsByUser(id: String): List<Level?> {
         val db = Firebase.firestore
         val usersRef = db.collection("completedLevels").document(id)

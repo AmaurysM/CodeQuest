@@ -7,7 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
-import com.amaurysdm.codequest.model.FireBaseController
+import com.amaurysdm.codequest.controllers.FireBaseController
 import com.amaurysdm.codequest.model.Level
 import com.amaurysdm.codequest.model.User
 import com.amaurysdm.codequest.navigation.Screens
@@ -23,13 +23,13 @@ class SettingsViewmodel : ViewModel() {
 
 
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
-    private var database = Firebase.firestore
 
     var user by mutableStateOf(FireBaseController.currentUser)
     var isParent by mutableStateOf(user.isAParent)
     var editingChild by mutableStateOf(User())
     var newChild by mutableStateOf(User())
 
+    // First time using Flow.
     private val _levelsFlow = MutableStateFlow<List<Level>>(emptyList())
     val levelsFlow: StateFlow<List<Level>> get() = _levelsFlow
 
@@ -43,11 +43,13 @@ class SettingsViewmodel : ViewModel() {
     var isEditingChild by mutableStateOf(false)
     var dropDownActive by mutableStateOf(false)
 
+    // initializes the data in the childrenFlow and levelsFlow
     init {
         updateChildrenFlow()
         updateLevelsFlow()
     }
 
+    // just gets the levels that the user has completed from firebase
     private fun updateLevelsFlow() {
         viewModelScope.launch {
             _levelsFlow.value =
@@ -55,6 +57,7 @@ class SettingsViewmodel : ViewModel() {
         }
     }
 
+    // gets the children of the user from firebase
     private fun updateChildrenFlow() {
         viewModelScope.launch {
             _childrenFlow.value = user.children.mapNotNull { childId ->
@@ -70,6 +73,7 @@ class SettingsViewmodel : ViewModel() {
         }
     }
 
+    // gets the levels that the child has completed from firebase
     fun observeChildLevels(child: User) {
         viewModelScope.launch {
             _editingChildLevelsFlow.value =
@@ -78,6 +82,7 @@ class SettingsViewmodel : ViewModel() {
         }
     }
 
+    // logs out the user from firebase
     fun logout(navController: NavHostController) {
         viewModelScope.launch {
             try {
@@ -91,6 +96,7 @@ class SettingsViewmodel : ViewModel() {
         }
     }
 
+    // removes the child from the user's children list
     fun removeChild() {
         viewModelScope.launch {
             try {
@@ -106,6 +112,7 @@ class SettingsViewmodel : ViewModel() {
         }
     }
 
+    // adds the child to the user's children list
     fun addChild() {
 
         viewModelScope.launch {
@@ -126,6 +133,7 @@ class SettingsViewmodel : ViewModel() {
         }
     }
 
+    // navigates back to the general screen
     fun back(navController: NavHostController) {
         navController.navigate(Screens.General.route) {
             popUpTo(navController.graph.id) {

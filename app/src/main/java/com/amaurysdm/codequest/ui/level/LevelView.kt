@@ -87,13 +87,17 @@ fun LevelView(
     val dropItemPlayer = MediaPlayer.create(navController.context, R.raw.drop)
     val pickItemPlayer = MediaPlayer.create(navController.context, R.raw.pickup)
 
+    // Theres space above and below the status bar that I just cant use
+    // This helps me get the height of the status bar height and navigation bar height
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
     val navigationBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-
+    // If I just used the modifier it would leave a space above and below the status bar
 
     Scaffold(modifier = Modifier
         .fillMaxSize()
         .background(
+            // I used a brush to create a gradient
+            // Since its in the background it looks like the top and bottom are different colors
             Brush.verticalGradient(
                 listOf(
                     MaterialTheme.colorScheme.secondary,
@@ -147,7 +151,8 @@ fun LevelView(
                                 .dragAndDropSource {
                                     detectTapGestures(
                                         onLongPress = { _ ->
-
+                                            // Should really implement
+                                            // state  hoisting but I made this in a rush
                                             levelViewModel.draggingItem = TopBarItem(
                                                 mutableStateOf(direction),
                                                 mutableStateOf(true)
@@ -177,7 +182,9 @@ fun LevelView(
                     .clickable(
                         enabled = !levelViewModel.isAnimating
                     ) {
-                        levelViewModel.isAnimating = true
+                        // Should move this to the viewmodel
+                        levelViewModel.isAnimating =
+                            true // This also controls weather the 'GO' button works
                         coroutineScope
                             .launch(Dispatchers.IO) {
                                 levelViewModel.playButton(navController)
@@ -188,6 +195,7 @@ fun LevelView(
                     }
 
             ) {
+                // Creates the 'GO' button using my custom composable
                 CreateText(
                     "GO",
                     textColor = Color.Black,
@@ -254,10 +262,14 @@ fun LevelView(
                                 target = remember {
                                     object : DragAndDropTarget {
                                         override fun onDrop(event: DragAndDropEvent): Boolean {
+                                            // Should really implement
+                                            // state hoisting but I made this in a rush
+                                            // this just places the item that you are dragging in the correct position
                                             levelViewModel.topBarItems[index] =
                                                 levelViewModel.draggingItem
                                             levelViewModel.draggingItem = TopBarItem()
 
+                                            // This turns the dropped item into the clickedItem
                                             if (levelViewModel.clickedItem == levelViewModel.topBarItems[index]) {
                                                 levelViewModel.clickedItem = TopBarItem()
                                             } else levelViewModel.clickedItem =
@@ -286,11 +298,12 @@ fun LevelView(
                                     .dragAndDropSource {
                                         detectTapGestures(
                                             onLongPress = { _ ->
-
+                                                // When you long press on an item I save it to draggingItem
                                                 levelViewModel.draggingItem =
                                                     levelViewModel.topBarItems[index]
                                                 levelViewModel.topBarItems[index] = TopBarItem()
 
+                                                // Creates a transfer data object
                                                 startTransfer(
                                                     transferData = DragAndDropTransferData(
                                                         clipData = ClipData.newPlainText(
@@ -302,6 +315,8 @@ fun LevelView(
 
                                             },
                                             onTap = {
+                                                // When you tap on an item I save it to clickedItem
+                                                // This is used to check if you clicked on the repeater
                                                 if (levelViewModel.clickedItem == levelViewModel.topBarItems[index]) {
                                                     levelViewModel.clickedItem = TopBarItem()
                                                 } else levelViewModel.clickedItem =
@@ -408,6 +423,7 @@ fun LevelView(
                 }
             }
 
+            // This is used by the repeater to place items
             AnimatedVisibility(
                 visible = levelViewModel.clickedItem.direction.value == Directions.Repeat,
                 enter = scaleIn() + fadeIn(),

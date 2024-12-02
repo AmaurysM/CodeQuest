@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import com.amaurysdm.codequest.navigation.Screens
 import com.amaurysdm.codequest.ui.register.SharedRegisterViewmodel
 
+// Navigates and updates the data of the user being created
 class ParentOrChildViewmodel : ViewModel() {
     fun goToChild(navController: NavHostController) {
         SharedRegisterViewmodel.userBeingCreated.isAParent = false

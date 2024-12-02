@@ -5,28 +5,43 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
-import com.amaurysdm.codequest.model.FireBaseController
+import com.amaurysdm.codequest.R
+import com.amaurysdm.codequest.controllers.FireBaseController
 import com.amaurysdm.codequest.model.LoginData
 import com.amaurysdm.codequest.navigation.Screens
 import kotlinx.coroutines.cancel
 
 class LoginViewmodel : ViewModel() {
+    var passwordVisible by mutableStateOf(false)
     var loginData by mutableStateOf(LoginData())
 
-    fun saveUser() {
-
-        FireBaseController.saveLevels()
+    fun togglePasswordVisibility() {
+        passwordVisible = !passwordVisible
     }
 
+    fun iconPassword(): Int {
+        return if (passwordVisible) {
+            R.drawable.baseline_visibility_24
+        } else {
+            R.drawable.baseline_visibility_off_24
+        }
+    }
+
+
     fun goBack(navController: NavHostController) {
-        navController.popBackStack()
-        FireBaseController.loginJob.cancel()
+        navController.navigate(Screens.UserCreationChild.Welcome.route) { // Navigate to the welcome screen
+            popUpTo(Screens.UserCreationChild.Login.route) { // Remove the login screen from the back stack
+                inclusive = true
+            }
+        }
+        FireBaseController.loginJob.cancel() // Cancel the login job
     }
 
     fun login(navController: NavHostController) {
         if (loginData.email.isEmpty() || loginData.password.isEmpty()) {
             return
         }
+        // Login to firebase
         FireBaseController.login(loginData, {
             navController.navigate(Screens.General.route) {
                 popUpTo(Screens.UserCreationChild.Login.route) {

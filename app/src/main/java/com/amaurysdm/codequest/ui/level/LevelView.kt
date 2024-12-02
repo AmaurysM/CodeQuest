@@ -3,6 +3,7 @@ package com.amaurysdm.codequest.ui.level
 import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipDescription
+import android.media.MediaPlayer
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -23,13 +24,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -49,13 +54,13 @@ import androidx.compose.ui.draganddrop.mimeTypes
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -79,15 +84,27 @@ fun LevelView(
     levelViewModel: LevelViewmodel = viewModel()
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val contex = LocalContext.current
-    //val mMediaPlayer = MediaPlayer.create(contex, R.raw.speedsound)
+    val dropItemPlayer = MediaPlayer.create(navController.context, R.raw.drop)
+    val pickItemPlayer = MediaPlayer.create(navController.context, R.raw.pickup)
+
+    val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    val navigationBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
 
-    Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
+    Scaffold(modifier = Modifier
+        .fillMaxSize()
+        .background(
+            Brush.verticalGradient(
+                listOf(
+                    MaterialTheme.colorScheme.secondary,
+                    MaterialTheme.colorScheme.primary
+                )
+            )
+        )
+        .padding(top = statusBarHeight, bottom = navigationBarHeight), bottomBar = {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.15f)
                 .background(Color(0xFF9eb50d))
                 .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
                 .background(MaterialTheme.colorScheme.primary)
@@ -100,6 +117,14 @@ fun LevelView(
                 modifier = Modifier
                     .fillMaxWidth(0.7f)
                     .padding(10.dp)
+                    .clip(
+                        RoundedCornerShape(
+                            bottomStart = 30.dp,
+                            bottomEnd = 30.dp,
+                            topStart = 10.dp,
+                            topEnd = 10.dp
+                        )
+                    )
                     .horizontalScroll(
                         state = rememberScrollState(),
                         enabled = true,
@@ -122,6 +147,7 @@ fun LevelView(
                                 .dragAndDropSource {
                                     detectTapGestures(
                                         onLongPress = { _ ->
+
                                             levelViewModel.draggingItem = TopBarItem(
                                                 mutableStateOf(direction),
                                                 mutableStateOf(true)
@@ -145,10 +171,9 @@ fun LevelView(
             Box(
                 modifier = Modifier
                     .size(100.dp)
-                    .clip(RoundedCornerShape(100.dp))
+                    .clip(RoundedCornerShape(30.dp))
                     .background(MaterialTheme.colorScheme.secondary)
                     .padding(10.dp)
-
                     .clickable(
                         enabled = !levelViewModel.isAnimating
                     ) {
@@ -160,20 +185,23 @@ fun LevelView(
                             .invokeOnCompletion {
                                 levelViewModel.isAnimating = false
                             }
-                        //mMediaPlayer.start()
                     }
 
             ) {
-                CreateText("GO", modifier = Modifier.align(Alignment.Center))
+                CreateText(
+                    "GO",
+                    textColor = Color.Black,
+                    modifier = Modifier.align(Alignment.Center)
+                )
             }
         }
     }, topBar = {
         Row(
             modifier = Modifier
+                .fillMaxWidth()
                 .background(Color(0xFF9eb50d))
                 .clip(RoundedCornerShape(bottomStart = 10.dp, bottomEnd = 10.dp))
-                .background(MaterialTheme.colorScheme.secondary)
-                .padding(top = 20.dp, bottom = 10.dp, start = 10.dp, end = 10.dp),
+                .background(MaterialTheme.colorScheme.secondary),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
 
@@ -190,13 +218,15 @@ fun LevelView(
                         levelViewModel.back(navController)
                     }
             ) {
-                CreateText("<", modifier = Modifier.align(Alignment.Center))
+                CreateText(
+                    "<",
+                    textColor = Color.Black,
+                    modifier = Modifier.align(Alignment.Center)
+                )
             }
             Row(
                 modifier = Modifier
-                    //.fillMaxWidth()
                     .background(MaterialTheme.colorScheme.secondary)
-                    //.padding(10.dp)
                     .horizontalScroll(
                         state = rememberScrollState(),
                         enabled = true,
@@ -224,7 +254,6 @@ fun LevelView(
                                 target = remember {
                                     object : DragAndDropTarget {
                                         override fun onDrop(event: DragAndDropEvent): Boolean {
-
                                             levelViewModel.topBarItems[index] =
                                                 levelViewModel.draggingItem
                                             levelViewModel.draggingItem = TopBarItem()
@@ -253,6 +282,7 @@ fun LevelView(
                                     id = levelViewModel.topBarItems[index].direction.value.icon
                                 ), contentDescription = null, modifier = Modifier
                                     .fillMaxSize()
+                                    .background(MaterialTheme.colorScheme.secondary)
                                     .dragAndDropSource {
                                         detectTapGestures(
                                             onLongPress = { _ ->
@@ -269,6 +299,7 @@ fun LevelView(
                                                         )
                                                     )
                                                 )
+
                                             },
                                             onTap = {
                                                 if (levelViewModel.clickedItem == levelViewModel.topBarItems[index]) {

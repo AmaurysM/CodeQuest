@@ -61,7 +61,7 @@ fun HomeView(
             ) {
                 CreateText(
                     text = "CodeQuest",
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    textColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = MaterialTheme.typography.headlineLarge,
                     textSize = 180f,
                     outlineWidth = 110f,
@@ -82,7 +82,7 @@ fun HomeView(
                     modifier = Modifier.size(100.dp, 100.dp)
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.baseline_settings_24),
+                        painter = painterResource(id = R.drawable.baseline_lightbulb_outline_24),
                         contentDescription = "Settings Button",
                         modifier = Modifier.fillMaxSize()
                     )

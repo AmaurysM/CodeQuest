@@ -292,8 +292,8 @@ class LevelViewmodel : ViewModel() {
         val mediaPlayer = MediaPlayer.create(context, R.raw.speedsound)
         gameState = gameState.copy(playerPosition = startLocation)
         mediaPlayer.start()
-        animatableX.animateTo(startLocation.first.toFloat())
-        animatableY.animateTo(startLocation.second.toFloat())
+        animatableX.snapTo(startLocation.first.toFloat())
+        animatableY.snapTo(startLocation.second.toFloat())
         mediaPlayer.release()
 
     }

@@ -219,7 +219,7 @@ fun LevelView(
                     .fillMaxWidth(0.1f)
                     .size(100.dp)
 
-                    .clip(RoundedCornerShape(100.dp))
+                    .clip(RoundedCornerShape( topStart = 0.dp, topEnd = 100.dp, bottomStart = 5.dp, bottomEnd = 100.dp))
                     .background(MaterialTheme.colorScheme.primary)
                     .padding(10.dp)
                     .clickable {

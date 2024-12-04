@@ -149,7 +149,7 @@ fun LoginView(
                     }
 
                 ) {
-                    Text(text = "Already have an account? ")
+                    Text(text = "Don't have an account? ")
                     Text(text = "Register", color = MaterialTheme.colorScheme.primary)
                 }
 

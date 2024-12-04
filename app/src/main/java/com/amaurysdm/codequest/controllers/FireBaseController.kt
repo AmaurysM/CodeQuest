@@ -1,3 +1,6 @@
+// NO LONGER USING THIS FILE.
+
+/*
 package com.amaurysdm.codequest.controllers
 
 import com.amaurysdm.codequest.model.Level
@@ -68,7 +71,6 @@ object FireBaseController {
                     userId = document["userId"] as String,
                     username = document["username"] as String,
                     email = document["email"] as String,
-                    children = document["children"] as? List<String> ?: emptyList(),
                     parent = document["parent"] as? String ?: "",
                     isAParent = document["aparent"] as? Boolean ?: false
                 )
@@ -115,7 +117,6 @@ object FireBaseController {
             userId = auth.currentUser?.uid ?: "",
             username = registerData.username,
             email = registerData.email,
-            children = emptyList(),
             parent = "",
             isAParent = registerData.areYouAParent
         )
@@ -166,7 +167,8 @@ object FireBaseController {
                     userId = document["userId"] as String,
                     username = document["username"] as String,
                     email = document["email"] as String,
-                    children = document["children"] as? List<String> ?: emptyList()
+                    parent = "",
+                    isAParent = document["aparent"] as Boolean
                 )
             }
         }
@@ -206,7 +208,7 @@ object FireBaseController {
                         userId = document["userId"] as String,
                         username = document["username"] as String,
                         email = document["email"] as String,
-                        children = document["children"] as? List<String> ?: emptyList()
+                        isAParent = document["aparent"] as Boolean
                     )
                     continuation.resume(user) // resumes the coroutine with the user object
                 } else {
@@ -231,7 +233,7 @@ object FireBaseController {
                     userId = document["userId"] as String,
                     username = document["username"] as String,
                     email = document["email"] as String,
-                    children = document["children"] as? List<String> ?: emptyList()
+                    isAParent = document["aparent"] as Boolean
                 )
             }
         } catch (e: Exception) {
@@ -263,4 +265,4 @@ object FireBaseController {
 
     }
 
-}
+}*/

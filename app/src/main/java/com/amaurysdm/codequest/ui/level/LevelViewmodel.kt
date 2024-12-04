@@ -15,7 +15,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import com.amaurysdm.codequest.R
-import com.amaurysdm.codequest.controllers.FireBaseController
 import com.amaurysdm.codequest.controllers.LevelController
 import com.amaurysdm.codequest.model.Directions
 import com.amaurysdm.codequest.model.GameState
@@ -270,8 +269,7 @@ class LevelViewmodel : ViewModel() {
                 withContext(Dispatchers.Main) {
                     launch {
                         navController.navigate(Screens.GameChild.LevelSelect.route)
-                        LevelController.getLevel().completed = true
-                        FireBaseController.saveLevels()
+                        LevelController.updateAndSaveCurrentLevel(true)
                     }
                 }
 
@@ -301,7 +299,7 @@ class LevelViewmodel : ViewModel() {
     // back button
     fun back(navController: NavHostController) {
         navController.navigate(Screens.GameChild.LevelSelect.route) {
-            popUpTo(Screens.GameChild.LevelSelect.route) {
+            popUpTo(navController.graph.startDestinationId) {
                 inclusive = true
             }
         }

@@ -1,21 +1,24 @@
 package com.amaurysdm.codequest.ui.register
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.amaurysdm.codequest.R
-import com.amaurysdm.codequest.controllers.FireBaseController
+import com.amaurysdm.codequest.controllers.room.RoomController
 import com.amaurysdm.codequest.model.RegisterData
 import com.amaurysdm.codequest.navigation.Screens
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class RegisterViewmodel : ViewModel() {
     var passwordVisible by mutableStateOf(false)
     var confirmPasswordVisible by mutableStateOf(false)
     var registerData by mutableStateOf(RegisterData())
+
 
     fun togglePasswordVisibility() {
         passwordVisible = !passwordVisible
@@ -53,16 +56,27 @@ class RegisterViewmodel : ViewModel() {
 
         registerData.areYouAParent = SharedRegisterViewmodel.userBeingCreated.isAParent
 
-        Log.e("registerData", registerData.toString())
 
-        FireBaseController.register(registerData, onRegister = {
-            navController.navigate(Screens.UserCreationChild.Login.route)
-        })
+        viewModelScope.launch(Dispatchers.IO, CoroutineStart.DEFAULT) {
+
+            if (RoomController.getUserByMail(registerData.email) == null) {
+                RoomController.register(
+                    registerData.username,
+                    registerData.email,
+                    registerData.password,
+                    registerData.areYouAParent
+                )
+            }
+
+        }
+        goToLogin(navController)
+
+
     }
 
     fun goBack(navController: NavHostController) {
         navController.popBackStack()
-        FireBaseController.registerJob.cancel()
+        RoomController.cancelRegister()
     }
 
     fun goToLogin(navController: NavHostController) {

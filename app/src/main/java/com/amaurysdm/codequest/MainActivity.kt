@@ -14,6 +14,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import com.amaurysdm.codequest.controllers.room.RoomController
 import com.amaurysdm.codequest.navigation.CodeQuestNavHost
 import com.amaurysdm.codequest.ui.theme.CodeQuestTheme
 
@@ -24,10 +25,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         // Makes the app stay in portrait mode
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+        RoomController.initializeRoom(applicationContext)
         setContent {
-
             CodeQuestApp()
-
         }
     }
 }

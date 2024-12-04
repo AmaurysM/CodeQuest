@@ -17,6 +17,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +40,7 @@ fun LevelSelectView(
     levelSelectViewModel: LevelSelectViewmodel = viewModel()
 ) {
 
+    val levelFlow = levelSelectViewModel.levels.collectAsState(emptyList())
     Box {
         Image(
             bitmap = ImageBitmap.imageResource(id = R.drawable.grass_background),
@@ -71,7 +73,7 @@ fun LevelSelectView(
                     columns = GridCells.Fixed(3)
                 ) {
                     items(
-                        levelSelectViewModel.levels
+                        levelFlow.value.size
                     ) {
                         Box(
                             modifier = Modifier

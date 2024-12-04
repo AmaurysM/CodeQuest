@@ -1,30 +1,22 @@
 package com.amaurysdm.codequest.ui.settings
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
-import com.amaurysdm.codequest.controllers.FireBaseController
+import com.amaurysdm.codequest.controllers.room.RoomController
 import com.amaurysdm.codequest.model.Level
 import com.amaurysdm.codequest.model.User
 import com.amaurysdm.codequest.navigation.Screens
-import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 class SettingsViewmodel : ViewModel() {
 
-
-    private var auth: FirebaseAuth = FirebaseAuth.getInstance()
-
-    var user by mutableStateOf(FireBaseController.currentUser)
+    var user by mutableStateOf(RoomController.currentUser)
     var isParent by mutableStateOf(user.isAParent)
     var editingChild by mutableStateOf(User())
     var newChild by mutableStateOf(User())
@@ -49,44 +41,37 @@ class SettingsViewmodel : ViewModel() {
         updateLevelsFlow()
     }
 
-    // just gets the levels that the user has completed from firebase
+    // just gets the levels that the user has completed from Room
     private fun updateLevelsFlow() {
         viewModelScope.launch {
             _levelsFlow.value =
-                FireBaseController.getCompletedLevelsByUser(user.userId).filterNotNull()
+                RoomController.getLevelsCompletedByUser(user.userId ?: 0).filterNotNull()
         }
     }
 
-    // gets the children of the user from firebase
+    // gets the children of the user from Room
     private fun updateChildrenFlow() {
         viewModelScope.launch {
-            _childrenFlow.value = user.children.mapNotNull { childId ->
-                try {
-                    FireBaseController.getUser(childId)
-                } catch (e: Exception) {
-                    null
-                }
-            }
-
-        }.invokeOnCompletion {
-            Log.e("TAG", "updateChildrenFlow: ${childrenFlow.value}")
+            _childrenFlow.value = RoomController.getChildren(user.userId ?: 0)
         }
+
     }
 
-    // gets the levels that the child has completed from firebase
+
+    // gets the levels that the child has completed from Room
     fun observeChildLevels(child: User) {
         viewModelScope.launch {
             _editingChildLevelsFlow.value =
-                FireBaseController.getCompletedLevelsByUser(child.userId).filterNotNull()
+                RoomController.getLevelsCompletedByUser(child.userId ?: 0).filterNotNull()
             editingChild = child
         }
     }
 
-    // logs out the user from firebase
+    // logs out the user from Room
     fun logout(navController: NavHostController) {
         viewModelScope.launch {
             try {
-                auth.signOut()
+                RoomController.logout()
                 navController.navigate(Screens.UserCreationChild.Welcome.route) {
                     popUpTo(navController.graph.id) { inclusive = true }
                 }
@@ -99,46 +84,40 @@ class SettingsViewmodel : ViewModel() {
     // removes the child from the user's children list
     fun removeChild() {
         viewModelScope.launch {
-            try {
-                val database = Firebase.firestore
-                database.collection("user")
-                    .document(user.userId)
-                    .update("children", user.children.minus(editingChild.userId))
-                    .await()
-
-            } catch (_: Exception) {
-
-            }
+            RoomController.removeChild(user.userId ?: 0, editingChild.userId ?: 0)
+            updateChildrenFlow()
         }
+
     }
 
     // adds the child to the user's children list
     fun addChild() {
 
         viewModelScope.launch {
-            try {
-                val childFound = FireBaseController.getUserFromEmail(newChild.email)
 
-                val database = Firebase.firestore
-                if (childFound != null) {
-                    database.collection("user")
-                        .document(user.userId)
-                        .update("children", user.children.plus(childFound.userId))
-                        .await()
 
-                }
-            } catch (_: Exception) {
+            val foundUser = RoomController.getUserByMail(newChild.email)
+            if (foundUser != null) {
+                RoomController.addChild(user.userId ?: 0, foundUser.userId ?: 0)
 
             }
+
+            /*val childrenFound = RoomController.getChildren(user.userId ?: 0)//RoomController.getUserFromEmail(newChild.email)
+            _childrenFlow.value = childrenFound*/
+            updateChildrenFlow()
+
+
         }
     }
 
     // navigates back to the general screen
     fun back(navController: NavHostController) {
+        RoomController.cancelLogout()
         navController.navigate(Screens.General.route) {
             popUpTo(navController.graph.id) {
                 inclusive = true
             }
         }
     }
+
 }

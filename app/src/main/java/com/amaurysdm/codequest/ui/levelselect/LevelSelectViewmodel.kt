@@ -8,10 +8,10 @@ import com.amaurysdm.codequest.navigation.Screens
 
 class LevelSelectViewmodel : ViewModel() {
 
-    var levels = LevelController.levels.value.size
+    var levels = LevelController.levels
 
-    fun getLevelsCompletedByUser(): List<Level> {
-        return LevelController.levels.value.filter { it.completed }
+    fun getLevels(): List<Level> {
+        return LevelController.levels.value
     }
 
     fun getLevel(it: Int): Level {

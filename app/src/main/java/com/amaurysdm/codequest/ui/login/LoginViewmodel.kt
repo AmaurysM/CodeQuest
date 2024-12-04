@@ -4,12 +4,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.amaurysdm.codequest.R
-import com.amaurysdm.codequest.controllers.FireBaseController
+import com.amaurysdm.codequest.controllers.room.RoomController
 import com.amaurysdm.codequest.model.LoginData
 import com.amaurysdm.codequest.navigation.Screens
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 class LoginViewmodel : ViewModel() {
     var passwordVisible by mutableStateOf(false)
@@ -34,7 +35,7 @@ class LoginViewmodel : ViewModel() {
                 inclusive = true
             }
         }
-        FireBaseController.loginJob.cancel() // Cancel the login job
+        RoomController.cancelLogin() // Cancel the login job
     }
 
     fun login(navController: NavHostController) {
@@ -42,14 +43,17 @@ class LoginViewmodel : ViewModel() {
             return
         }
         // Login to firebase
-        FireBaseController.login(loginData, {
+        viewModelScope.launch {
+            RoomController.login(loginData.email, loginData.password)
+
+        }.invokeOnCompletion {
             navController.navigate(Screens.General.route) {
                 popUpTo(Screens.UserCreationChild.Login.route) {
                     inclusive = true
                 }
             }
-            FireBaseController.getUserData()
-        })
+        }
+
     }
 
     fun goToRegister(navController: NavHostController) {

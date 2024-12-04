@@ -185,7 +185,7 @@ fun RegisterView(
                     }
 
                 ) {
-                    Text(text = "Don't have an account? ")
+                    Text(text = "Already have an account? ")
                     Text(text = "Login", color = MaterialTheme.colorScheme.primary)
                 }
 

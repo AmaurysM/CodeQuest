@@ -212,19 +212,23 @@ fun SettingsView(
                         )
                     }
 
-                    Row {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         Button(
                             onClick = {
                                 settingsViewmodel.isAddingChild = false
-                            }
+                            }, shape = MaterialTheme.shapes.extraSmall
                         ) {
-                            Text(text = "Cancel")
+                            Text(text = "Close")
                         }
 
-                        Button(onClick = {
-                            settingsViewmodel.isAddingChild = false
-                            settingsViewmodel.addChild()
-                        }
+                        Button(
+                            onClick = {
+                                settingsViewmodel.addChild()
+                            }, shape = MaterialTheme.shapes.extraSmall
+
                         ) {
                             Text(text = "Add")
                         }

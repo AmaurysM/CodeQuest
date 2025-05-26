@@ -2,8 +2,6 @@ package com.amaurysdm.codequest.ui.level
 
 import android.content.Context
 import android.media.MediaPlayer
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.MutableIntState
@@ -14,7 +12,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import com.amaurysdm.codequest.R

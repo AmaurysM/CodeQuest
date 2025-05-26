@@ -13,4 +13,8 @@ class WelcomeViewmodel : ViewModel() {
     fun navigateRegister(navController: NavHostController) {
         navController.navigate(Screens.UserCreationChild.Register.route)
     }
+
+    fun navigateToHome(navController: NavHostController) {
+        navController.navigate(Screens.GeneralChild.Home.route)
+    }
 }

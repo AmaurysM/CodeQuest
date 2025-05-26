@@ -56,7 +56,18 @@ object LevelController {
             Level("Level 5", "rdrdrdrdrdrd/", false),
             Level("Level 6", "ddrrdddldldld/", false),
             Level("Level 7", "urururrrrddldldld/", false),
-            Level("Level 8", "ddddrrrruulldddddrrrrruulldddd/", false)
+            Level("Level 8", "ddddrrrruulldddddrrrrruulldddd/", false),
+
+                    Level("Level 9", "rrddlluu/", false), // Makes a box, repeated
+        Level("Level 10", "rdrdrdluulddrdrdrd/", false), // A loop then some extras
+        Level("Level 11", "drrruulllldddrrruullllddd/", false), // Zigzag blocks
+        Level("Level 12", "druldrludruldrludruld/", false), // Tight weaving pattern
+        Level("Level 13", "rrrrddddlllluuuurrrrddddlllluuu/", false), // Square spiral in parts
+        Level("Level 14", "drdrdrdrdluuluuluuluu/", false), // Tight stairs with loops
+        Level("Level 15", "dldruldruldruldruld/", false), // Diagonal challenge
+        Level("Level 16", "rdrdrdrdrdluuldrdrdrdrdluul/", false), // Long interlocking loops
+        Level("Level 17", "rrddlluuurrddlluuurrddlluuu/", false), // Box stacks
+        Level("Level 18", "rdruldruldruldrruulldrruull/", false) // Intricate figure-eight
 
         )
     }

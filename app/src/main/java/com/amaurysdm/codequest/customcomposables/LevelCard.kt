@@ -12,14 +12,15 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,7 +29,6 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,21 +42,35 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
+@Preview(name = "Level 0 Preview")
+@Composable
+fun LevelCardPreview(){
+
+
+    Row(modifier = Modifier.background(Color.White)){
+        LevelCard(0,true, false, { }, 2,true)
+        LevelCard(10,false, false, { }, 2,true)
+        LevelCard(100,false, true, { }, 2,true)
+    }
+
+}
 
 @Composable
 fun LevelCard(
-    levelNumber: Int,
-    isCompleted: Boolean,
-    isLocked: Boolean,
-    onClick: () -> Unit,
-    animationDelay: Long
+    levelNumber: Int = 0,
+    isCompleted: Boolean = false,
+    isLocked: Boolean = false,
+    onClick: () -> Unit = {},
+    animationDelay: Long = 2000,
+    forceVisible: Boolean = false // <- for preview
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
-    var isVisible by remember { mutableStateOf(false) }
+    var isVisible by remember { mutableStateOf(forceVisible) }
 
     // Entrance animation with delay
     LaunchedEffect(Unit) {
@@ -93,29 +107,32 @@ fun LevelCard(
         ) + fadeIn(),
         exit = scaleOut() + fadeOut()
     ) {
-        Surface(
+        Box(
             modifier = Modifier
                 .size(80.dp)
                 .scale(scale)
                 .rotate(rotation)
                 .clickable {
-                    if (!isLocked) onClick() else { }
-                },
-            shape = RoundedCornerShape(20.dp),
-            color = when {
-                isLocked -> Color.Gray.copy(alpha = 0.3f)
-                isCompleted -> Color(0xFF4CAF50).copy(alpha = 0.8f)
-                else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
-            },
-            border = BorderStroke(
-                width = 2.dp,
-                color = when {
-                    isLocked -> Color.Gray.copy(alpha = 0.5f)
-                    isCompleted -> Color(0xFF8BC34A)
-                    else -> Color.White.copy(alpha = 0.6f)
+                    if (!isLocked) onClick() else {
+                    }
                 }
-            ),
-            shadowElevation = if (isCompleted) 12.dp else 6.dp
+                .background(
+                    color =  when {
+                        isLocked -> MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                        isCompleted -> MaterialTheme.colorScheme.primary.copy(alpha = 1f)
+                        else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                    },
+                    shape = RoundedCornerShape(20.dp)
+                )
+                .border(
+                    width = 1.dp,
+                    color = when {
+                        isLocked -> MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                        isCompleted -> MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
+                        else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                    },
+                    shape = RoundedCornerShape(20.dp)
+                )
         ) {
             Box(
                 contentAlignment = Alignment.Center,
@@ -176,7 +193,7 @@ fun LevelCard(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(
-                                Color.White.copy(alpha = glowAlpha),
+                                MaterialTheme.colorScheme.primary.copy(alpha = glowAlpha),
                                 RoundedCornerShape(20.dp)
                             )
                     )

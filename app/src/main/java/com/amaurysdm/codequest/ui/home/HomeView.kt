@@ -1,13 +1,25 @@
 package com.amaurysdm.codequest.ui.home
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
@@ -17,6 +29,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.amaurysdm.codequest.R
+import com.amaurysdm.codequest.customcomposables.ParallaxBackground
 
 @Composable
 fun HomeView(
@@ -27,9 +40,11 @@ fun HomeView(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(41, 29, 44))
-            .padding(24.dp)
+
     ) {
+
+        ParallaxBackground()
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -40,7 +55,7 @@ fun HomeView(
             Spacer(modifier = Modifier.height(32.dp))
 
             Image(
-                bitmap = ImageBitmap.imageResource(id = R.drawable.code_quest_logo),
+                bitmap = ImageBitmap.imageResource(id = R.drawable.code_quest_logo_nback),
                 contentDescription = "Code Quest Logo",
                 modifier = Modifier
                     .fillMaxWidth(0.7f)

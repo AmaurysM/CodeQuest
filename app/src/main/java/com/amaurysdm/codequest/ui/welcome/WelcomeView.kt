@@ -1,5 +1,6 @@
 package com.amaurysdm.codequest.ui.welcome
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -34,6 +34,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.amaurysdm.codequest.R
+import com.amaurysdm.codequest.customcomposables.ParallaxBackground
 
 @Preview(showBackground = true)
 @Composable
@@ -42,6 +43,8 @@ fun WelcomeView(
     welcomeViewModel: WelcomeViewmodel = viewModel()
 ) {
     Box(modifier = Modifier.fillMaxWidth().background(color = Color(41, 29, 44))) {
+        ParallaxBackground()
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -57,11 +60,11 @@ fun WelcomeView(
                 verticalArrangement = Arrangement.Center
             ) {
                 Image(
-                    bitmap = ImageBitmap.imageResource(id = R.drawable.code_quest_logo),
+                    bitmap = ImageBitmap.imageResource(id = R.drawable.code_quest_logo_nback),
                     contentDescription = "Logo",
                     modifier = Modifier.fillMaxWidth(),
                     alignment = Alignment.Center,
-                    contentScale = ContentScale.FillHeight
+                    contentScale = ContentScale.FillWidth
                 )
             }
 
@@ -72,7 +75,7 @@ fun WelcomeView(
             ) {
                 // Start Game Button (assuming this will be the main action)
                 Button(
-                    onClick = { welcomeViewModel.navigateLogin(navController) },
+                    onClick = { welcomeViewModel.navigateToHome(navController) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp)
@@ -91,18 +94,16 @@ fun WelcomeView(
                 }
 
                 // Login Button
-                OutlinedButton(
+                Button(
                     onClick = { welcomeViewModel.navigateLogin(navController) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
                     shape = RoundedCornerShape(24.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = MaterialTheme.colorScheme.primary
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                     ),
-                    border = ButtonDefaults.outlinedButtonBorder.copy(
-                        width = 2.dp
-                    )
+                    border =  BorderStroke( 2.dp,MaterialTheme.colorScheme.primary)
                 ) {
                     Text(
                         text = "Login",

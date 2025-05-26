@@ -1,23 +1,57 @@
 package com.amaurysdm.codequest.ui.level
 
-import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipDescription
-import android.media.MediaPlayer
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.*
-import androidx.compose.foundation.draganddrop.*
-import androidx.compose.foundation.gestures.*
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.draganddrop.dragAndDropSource
+import androidx.compose.foundation.draganddrop.dragAndDropTarget
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draganddrop.DragAndDropEvent
@@ -27,12 +61,15 @@ import androidx.compose.ui.draganddrop.mimeTypes
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
@@ -44,9 +81,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.amaurysdm.codequest.R
-import com.amaurysdm.codequest.customcomposables.OutlinedText
 import com.amaurysdm.codequest.customcomposables.ParallaxBackground
-import com.amaurysdm.codequest.customcomposables.UpDownKeys
+import com.amaurysdm.codequest.customcomposables.RepeaterOverlay
 import com.amaurysdm.codequest.model.Directions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -60,35 +96,21 @@ fun LevelView(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
-    val density = LocalDensity.current
 
-    // Animation states for enhanced UI
     val topBarAnimation = remember { Animatable(0f) }
     val bottomBarAnimation = remember { Animatable(0f) }
     val gameAreaAnimation = remember { Animatable(0f) }
 
-    // Launch enter animations
     LaunchedEffect(Unit) {
         launch { topBarAnimation.animateTo(1f, tween(600, easing = FastOutSlowInEasing)) }
         launch { bottomBarAnimation.animateTo(1f, tween(800, 200, FastOutSlowInEasing)) }
         launch { gameAreaAnimation.animateTo(1f, tween(1000, 400, FastOutSlowInEasing)) }
     }
 
-    // Enhanced gradient background
-    val backgroundBrush = Brush.radialGradient(
-        colors = listOf(
-            MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-            MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f),
-            MaterialTheme.colorScheme.tertiary.copy(alpha = 0.8f)
-        ),
-        radius = 1200f
-    )
-
     Box {
 
-
         Scaffold(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .background(Color.Transparent),
             topBar = {
@@ -524,23 +546,16 @@ private fun GameArea(
                         contentAlignment = Alignment.Center
 
                     ) {
-                        if (isStart) {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(R.drawable.baseline_play_arrow_24),
-                                contentDescription = "Start",
-                                modifier = Modifier.size(tileSize * 0.6f),
-                                tint = MaterialTheme.colorScheme.onSecondary
-                            )
-                        } else if (isEnd) {
+                        if (isEnd) {
                             Image(
-                                painter = painterResource(id = R.drawable.img_1),
+                                painter = painterResource(id = R.drawable.basic_tile),
                                 contentDescription = "End",
                                 modifier = Modifier.fillMaxSize(),
                                 colorFilter = ColorFilter.tint(Color.Yellow, BlendMode.Softlight)
                             )
                         } else {
                             Image(
-                                painter = painterResource(id = R.drawable.img_1),
+                                painter = painterResource(id = R.drawable.basic_tile),
                                 contentDescription = "Tile",
                                 modifier = Modifier.fillMaxSize(),
                             )
@@ -585,134 +600,5 @@ private fun GameArea(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun RepeaterOverlay(
-    levelViewModel: LevelViewmodel,
-    modifier: Modifier = Modifier
-) {
-    AnimatedVisibility(
-        visible = levelViewModel.clickedItem.direction.value == Directions.Repeat,
-        enter = slideInVertically { -it } + fadeIn(),
-        exit = slideOutVertically { -it } + fadeOut(),
-        modifier = modifier
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Repeat Configuration",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
 
-                Spacer(modifier = Modifier.height(16.dp))
 
-                // Initialize children if empty
-                if (levelViewModel.clickedItem.children.isEmpty()) {
-                    levelViewModel.clickedItem.children = remember {
-                        mutableStateListOf(TopBarItem(), TopBarItem())
-                    }
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    levelViewModel.clickedItem.children.forEachIndexed() { index, child ->
-                        RepeaterSlot(
-                            item = child,
-                            index = index,
-                            levelViewModel = levelViewModel
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                UpDownKeys(
-                    modifier = Modifier,
-                    initialNumber = levelViewModel.clickedItem.repeater
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun RepeaterSlot(
-    item: TopBarItem,
-    index: Int,
-    levelViewModel: LevelViewmodel
-) {
-    Card(
-        modifier = Modifier
-            .size(80.dp)
-            .dragAndDropTarget(
-                shouldStartDragAndDrop = { event ->
-                    event.mimeTypes().contains(ClipDescription.MIMETYPE_TEXT_PLAIN)
-                },
-                target = remember {
-                    object : DragAndDropTarget {
-                        override fun onDrop(event: DragAndDropEvent): Boolean {
-                            levelViewModel.clickedItem.children[index] = levelViewModel.draggingItem
-                            levelViewModel.draggingItem = TopBarItem()
-                            return true
-                        }
-                    }
-                }
-            ),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (item.isVisible.value)
-                MaterialTheme.colorScheme.primaryContainer
-            else MaterialTheme.colorScheme.surfaceVariant
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            androidx.compose.animation.AnimatedVisibility(
-                visible = item.isVisible.value,
-                enter = scaleIn() + fadeIn(),
-                exit = scaleOut() + fadeOut()
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(item.direction.value.icon),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(40.dp)
-                        .dragAndDropSource(block = {
-                            detectTapGestures(
-                                onLongPress = {
-                                    levelViewModel.draggingItem =
-                                        levelViewModel.clickedItem.children[index]
-                                    levelViewModel.clickedItem.children[index] = TopBarItem()
-                                    startTransfer(
-                                        DragAndDropTransferData(
-                                            clipData = ClipData.newPlainText("text", "")
-                                        )
-                                    )
-                                }
-                            )
-                        }),
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            }
-        }
-    }
-}

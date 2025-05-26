@@ -22,11 +22,13 @@ Each arrow represents a direction: left, right, up, or down.
 Strategically plan your moves to guide the rock across the platform.
 The game will track your progress and save data for future sessions.
 
-<img src="https://github.com/user-attachments/assets/fef8c2cb-2b48-4a86-9660-4601c06a60cc" width="300"/>
+![Screenshot 2025-05-26 182515](https://github.com/user-attachments/assets/76bec468-666d-4228-8216-251ccfff8cf6)
 
-<img src="https://github.com/user-attachments/assets/24f596d4-3225-4a3e-9c51-65cda00244f6" width="300"/>
+![Screenshot 2025-05-26 182610](https://github.com/user-attachments/assets/22113a8f-3b83-4aaa-b633-8d11e9dbb42b)
 
-<img src="https://github.com/user-attachments/assets/bda0d5eb-a8e1-4222-96f6-ab29380e6f73" width="300"/>
+![Screenshot 2025-05-26 182801](https://github.com/user-attachments/assets/5c3564c8-4284-4720-aebb-7fc0c31b59ac)
 
-https://github.com/user-attachments/assets/bfd47b60-c411-42cf-a830-74bbd51a768d
+https://github.com/user-attachments/assets/2260c336-f3ca-448c-a1f6-605b54902fe9
+
+
 

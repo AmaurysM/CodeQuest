@@ -45,7 +45,7 @@ fun UpDownKeys(
                 tint = MaterialTheme.colorScheme.onPrimary
             )
         }
-        CreateText(
+        OutlinedText(
             "${initialNumber.intValue}", modifier = Modifier.size(30.dp)
         )
         Box(

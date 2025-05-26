@@ -2,6 +2,8 @@ package com.amaurysdm.codequest.ui.level
 
 import android.content.Context
 import android.media.MediaPlayer
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.MutableIntState
@@ -12,6 +14,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import com.amaurysdm.codequest.R
@@ -55,6 +58,7 @@ class LevelViewmodel : ViewModel() {
 
     var topBarItems = mutableStateListOf<TopBarItem>()
     var bottomBarItems = mutableListOf<Directions>()
+
 
     init {
         gameState = GameState(startLocation, createPathCoordinates())
@@ -214,8 +218,8 @@ class LevelViewmodel : ViewModel() {
             )
     }
 
-    // Makes the character move.
-    suspend fun playButton(navController: NavHostController) {
+
+    suspend fun playButton(navController: NavHostController,context: Context) {
         val chosenDirection = usableTopBarItems()
         val turnsInLevel = locationOfTurnsAndFlag(gameState.path)
         val scope = CoroutineScope(coroutineContext)
@@ -233,27 +237,30 @@ class LevelViewmodel : ViewModel() {
             if (validMove(chosenDirection[currentMove].direction.value)) {
 
                 scope.launch {
-                    // plays a sound
-                    val mediaPlayer = MediaPlayer.create(navController.context, R.raw.speedsoundcut)
-                    mediaPlayer.start()
+                    val mediaPlayer = MediaPlayer.create(
+                        context,
+                        R.raw.speedsoundcut
+                    )
 
-                    // animates the player to move
-                    // you only need to move the x or y axis.
-                    if (chosenDirection[currentMove].direction.value.movement.first == 0) {
-                        animatableY.animateTo(
-                            targetValue = turnsInLevel[currentMove].second.toFloat(),
-                            animationSpec = tween(durationMillis = 500)
-                        )
-                    } else {
-                        animatableX.animateTo(
-                            targetValue = turnsInLevel[currentMove].first.toFloat(),
-                            animationSpec = tween(durationMillis = 500)
-                        )
+                    try {
+                        mediaPlayer?.start()
+
+                        if (chosenDirection[currentMove].direction.value.movement.first == 0) {
+                            animatableY.animateTo(
+                                targetValue = turnsInLevel[currentMove].second.toFloat(),
+                                animationSpec = tween(durationMillis = 500)
+                            )
+                        } else {
+                            animatableX.animateTo(
+                                targetValue = turnsInLevel[currentMove].first.toFloat(),
+                                animationSpec = tween(durationMillis = 500)
+                            )
+                        }
+                    } finally {
+                        mediaPlayer?.release()
                     }
+                }.join()
 
-                    // top the music
-                    mediaPlayer.release()
-                }.join() // wait for it to finish then update the gameState
 
                 // Theres a better way to do this but time is my enemy
                 gameState = gameState.copy(

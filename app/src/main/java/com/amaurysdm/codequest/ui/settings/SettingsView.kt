@@ -17,7 +17,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -40,265 +41,210 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.amaurysdm.codequest.R
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
 @Composable
 fun SettingsView(
     navController: NavHostController = rememberNavController(),
     settingsViewmodel: SettingsViewmodel = viewModel()
 ) {
-
     val kids by settingsViewmodel.childrenFlow.collectAsState(emptyList())
     val kidLevels by settingsViewmodel.editingChildLevelsFlow.collectAsState(emptyList())
     val myLevels by settingsViewmodel.levelsFlow.collectAsState(emptyList())
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         Image(
             bitmap = ImageBitmap.imageResource(id = R.drawable.grass_background),
-            contentDescription = "background",
+            contentDescription = null,
             modifier = Modifier.fillMaxSize(),
-            alignment = Alignment.Center,
-            contentScale = ContentScale.FillHeight
+            contentScale = ContentScale.Crop
         )
 
         Column(
             modifier = Modifier
                 .align(Alignment.Center)
-                .fillMaxWidth()
-                .padding(40.dp)
-                .clip(MaterialTheme.shapes.small)
+                .padding(24.dp)
+                .clip(MaterialTheme.shapes.medium)
                 .background(MaterialTheme.colorScheme.surface)
-                .padding(20.dp),
+                .padding(24.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
 
-            Box(
+            // Avatar
+            Image(
+                imageVector = ImageVector.vectorResource(id = R.drawable.baseline_person_24),
+                contentDescription = null,
                 modifier = Modifier
+                    .size(96.dp)
                     .clip(MaterialTheme.shapes.extraLarge)
-                    .size(100.dp)
-            ) {
-                Image(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.baseline_person_24),
-                    contentDescription = "Back Button",
-                    modifier = Modifier.fillMaxSize()
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .padding(16.dp)
+            )
 
-                )
-            }
-
-            Column(
+            // User Info
+            Card(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                elevation = CardDefaults.cardElevation(4.dp)
             ) {
-                Text(text = "Username: ${settingsViewmodel.user.username}")
-                Text(text = "Email: ${settingsViewmodel.user.email}")
-                Text(text = "Levels Completed: ${myLevels.size}")
-            }
-
-            if (settingsViewmodel.dropDownActive) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp)
-                        .background(MaterialTheme.colorScheme.surface)
-                        .verticalScroll(state = rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.Start
                 ) {
-                    Column {
-                        kids.forEach {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(10.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(text = it.email)
-                                Icon(imageVector = ImageVector.vectorResource(id = R.drawable.baseline_edit_24),
-                                    contentDescription = null,
-                                    modifier = Modifier.clickable {
-                                        settingsViewmodel.isEditingChild = true
-                                        settingsViewmodel.observeChildLevels(it)
-
-                                    })
-
-                            }
-                        }
-                    }
-
-                    Button(
-                        onClick = { settingsViewmodel.isAddingChild = true },
-                        shape = MaterialTheme.shapes.extraSmall
-                    ) {
-                        Text(text = "Add Child")
-                    }
-
+                    Text("Username: ${settingsViewmodel.user.username}")
+                    Text("Email: ${settingsViewmodel.user.email}")
+                    Text("Levels Completed: ${myLevels.size}")
                 }
             }
 
+            // Dropdown for child accounts
+            if (settingsViewmodel.dropDownActive) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    elevation = CardDefaults.cardElevation(4.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        kids.forEach {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(it.email)
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.baseline_edit_24),
+                                    contentDescription = "Edit Child",
+                                    modifier = Modifier
+                                        .clickable {
+                                            settingsViewmodel.isEditingChild = true
+                                            settingsViewmodel.observeChildLevels(it)
+                                        }
+                                        .size(24.dp)
+                                )
+                            }
+                        }
 
+                        Button(
+                            onClick = { settingsViewmodel.isAddingChild = true },
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        ) {
+                            Text("Add Child")
+                        }
+                    }
+                }
+            }
+
+            // Navigation and logout
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Button(
-                    onClick = { settingsViewmodel.back(navController) },
-                    shape = MaterialTheme.shapes.extraSmall
-                ) {
-                    Text(text = "Back")
+                Button(onClick = { settingsViewmodel.back(navController) }) {
+                    Text("Back")
                 }
 
                 if (settingsViewmodel.isParent) {
-                    Icon(imageVector =
-                    if (!settingsViewmodel.dropDownActive)
-                        Icons.Filled.KeyboardArrowDown
-                    else
-                        Icons.Filled.KeyboardArrowUp,
+                    Icon(
+                        imageVector = if (settingsViewmodel.dropDownActive) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
                         contentDescription = null,
                         modifier = Modifier
                             .clickable {
                                 settingsViewmodel.dropDownActive = !settingsViewmodel.dropDownActive
                             }
-                            .size(30.dp)
+                            .size(36.dp)
                     )
                 }
 
-                Button(
-                    onClick = { settingsViewmodel.logout(navController) },
-                    shape = MaterialTheme.shapes.extraSmall
-                ) {
-                    Text(text = "Logout")
+                Button(onClick = { settingsViewmodel.logout(navController) }) {
+                    Text("Logout")
                 }
             }
         }
 
+        // Add Child Dialog
         if (settingsViewmodel.isAddingChild) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f))
-                    .clickable {
-                        ; // Do nothing
-                    }
-            ) {
+            DialogOverlay {
                 Column(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .fillMaxWidth()
-                        .padding(40.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .background(MaterialTheme.colorScheme.surface)
-                        .padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text(text = "Add Child")
+                    Text("Add Child", style = MaterialTheme.typography.titleMedium)
 
-
-                    Column {
-                        OutlinedTextField(
-                            value = settingsViewmodel.newChild.email,
-                            onValueChange = {
-                                settingsViewmodel.newChild =
-                                    settingsViewmodel.newChild.copy(email = it)
-                            },
-                            label = { Text(text = "Child Email") }
-                        )
-                    }
+                    OutlinedTextField(
+                        value = settingsViewmodel.newChild.email,
+                        onValueChange = {
+                            settingsViewmodel.newChild = settingsViewmodel.newChild.copy(email = it)
+                        },
+                        label = { Text("Child Email") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Button(
-                            onClick = {
-                                settingsViewmodel.isAddingChild = false
-                            }, shape = MaterialTheme.shapes.extraSmall
-                        ) {
-                            Text(text = "Close")
+                        Button(onClick = { settingsViewmodel.isAddingChild = false }) {
+                            Text("Close")
                         }
-
-                        Button(
-                            onClick = {
-                                settingsViewmodel.addChild()
-                            }, shape = MaterialTheme.shapes.extraSmall
-
-                        ) {
-                            Text(text = "Add")
+                        Button(onClick = { settingsViewmodel.addChild() }) {
+                            Text("Add")
                         }
                     }
-
-
                 }
-
             }
-
         }
 
+        // Edit Child Dialog
         if (settingsViewmodel.isEditingChild) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f))
-                    .clickable {
-                        ; // Do nothing
-                    }
-            ) {
+            DialogOverlay {
                 Column(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .fillMaxWidth()
-                        .padding(40.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .background(MaterialTheme.colorScheme.surface)
-                        .padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text(text = "Child Info")
-
-
-                    Column {
-                        Text(text = "Child Email: ${settingsViewmodel.editingChild.email}")
-                        Text(text = "Child Username: ${settingsViewmodel.editingChild.username}")
-                        Text(text = "Completed Levels: ${kidLevels.size}")
-                    }
+                    Text("Child Info", style = MaterialTheme.typography.titleMedium)
+                    Text("Email: ${settingsViewmodel.editingChild.email}")
+                    Text("Username: ${settingsViewmodel.editingChild.username}")
+                    Text("Completed Levels: ${kidLevels.size}")
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Button(
-                            onClick = {
-                                settingsViewmodel.isEditingChild = false
-
-                            }, shape = MaterialTheme.shapes.extraSmall
-                        ) {
-                            Text(text = "Cancel")
+                        Button(onClick = { settingsViewmodel.isEditingChild = false }) {
+                            Text("Cancel")
                         }
-
-                        Button(
-                            onClick = {
-                                settingsViewmodel.isEditingChild = false
-                                settingsViewmodel.removeChild()
-                            }, shape = MaterialTheme.shapes.extraSmall
-                        ) {
-                            Text(text = "Remove")
+                        Button(onClick = {
+                            settingsViewmodel.isEditingChild = false
+                            settingsViewmodel.removeChild()
+                        }) {
+                            Text("Remove")
                         }
                     }
-
-
                 }
-
             }
         }
+    }
+}
 
+@Composable
+fun DialogOverlay(content: @Composable () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.3f))
+            .clickable(enabled = false) { }
+            .padding(32.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(8.dp)
+        ) {
+            Box(modifier = Modifier.padding(24.dp)) {
+                content()
+            }
+        }
     }
 }

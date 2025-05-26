@@ -1,30 +1,39 @@
 package com.amaurysdm.codequest.ui.welcome
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.amaurysdm.codequest.R
-import com.amaurysdm.codequest.customcomposables.CreateText
-import com.amaurysdm.codequest.customcomposables.TitleAnimation
 
 @Preview(showBackground = true)
 @Composable
@@ -32,17 +41,7 @@ fun WelcomeView(
     navController: NavHostController = rememberNavController(),
     welcomeViewModel: WelcomeViewmodel = viewModel()
 ) {
-    val titleAnimation = TitleAnimation()
-
-    Box(modifier = Modifier.fillMaxWidth()) {
-        Image(
-            bitmap = ImageBitmap.imageResource(id = R.drawable.grass_background),
-            contentDescription = "background",
-            modifier = Modifier.fillMaxSize(),
-            alignment = Alignment.Center,
-            contentScale = ContentScale.FillHeight
-        )
-
+    Box(modifier = Modifier.fillMaxWidth().background(color = Color(41, 29, 44))) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -57,33 +56,78 @@ fun WelcomeView(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // Custom composable for the title
-                CreateText(
-                    text = "CodeQuest",
-                    textColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    style = MaterialTheme.typography.headlineLarge,
-                    textSize = 180f,
-                    outlineWidth = 110f,
-                    bobbing = titleAnimation.first,
-                    rotation = titleAnimation.second
+                Image(
+                    bitmap = ImageBitmap.imageResource(id = R.drawable.code_quest_logo),
+                    contentDescription = "Logo",
+                    modifier = Modifier.fillMaxWidth(),
+                    alignment = Alignment.Center,
+                    contentScale = ContentScale.FillHeight
                 )
             }
 
-            Button(
-                onClick = { welcomeViewModel.navigateLogin(navController) },
-                shape = MaterialTheme.shapes.small,
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text(text = "Login")
+                // Start Game Button (assuming this will be the main action)
+                Button(
+                    onClick = { welcomeViewModel.navigateLogin(navController) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .shadow(4.dp, RoundedCornerShape(28.dp)),
+                    shape = RoundedCornerShape(28.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Text(
+                        text = "Start Adventure",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                }
+
+                // Login Button
+                OutlinedButton(
+                    onClick = { welcomeViewModel.navigateLogin(navController) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary
+                    ),
+                    border = ButtonDefaults.outlinedButtonBorder.copy(
+                        width = 2.dp
+                    )
+                ) {
+                    Text(
+                        text = "Login",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                // Register Button
+                TextButton(
+                    onClick = { welcomeViewModel.navigateRegister(navController) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    shape = RoundedCornerShape(24.dp)
+                ) {
+                    Text(
+                        text = "Create New Account",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                    )
+                }
             }
 
-            Button(
-                onClick = { welcomeViewModel.navigateRegister(navController) },
-                shape = MaterialTheme.shapes.small,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "Register")
-            }
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

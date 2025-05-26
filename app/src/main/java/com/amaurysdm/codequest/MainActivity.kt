@@ -34,15 +34,15 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun CodeQuestApp() {
-    val context = LocalContext.current
-    val soundManager = MediaPlayer.create(context, R.raw.outdoors)
-    DisposableEffect(Unit) {
-        soundManager.isLooping = true
-        soundManager.start()
-        onDispose {
-            soundManager.release()
-        }
-    }
+//    val context = LocalContext.current
+//    val soundManager = MediaPlayer.create(context, R.raw.outdoors)
+//    DisposableEffect(Unit) {
+//        soundManager.isLooping = true
+//        soundManager.start()
+//        onDispose {
+//            soundManager.release()
+//        }
+//    }
     CodeQuestTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             CodeQuestNavHost(

@@ -54,9 +54,6 @@ class RegisterViewmodel : ViewModel() {
             return
         }
 
-        registerData.areYouAParent = SharedRegisterViewmodel.userBeingCreated.isAParent
-
-
         viewModelScope.launch(Dispatchers.IO, CoroutineStart.DEFAULT) {
 
             if (RoomController.getUserByMail(registerData.email) == null) {

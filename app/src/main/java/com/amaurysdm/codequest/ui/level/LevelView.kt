@@ -21,6 +21,7 @@ import androidx.compose.foundation.draganddrop.dragAndDropSource
 import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -360,6 +361,8 @@ private fun EnhancedBottomBar(
     context: android.content.Context,
     coroutineScope: kotlinx.coroutines.CoroutineScope
 ) {
+    val scrollState = rememberScrollState()
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -377,13 +380,13 @@ private fun EnhancedBottomBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            // Command palette
-            LazyRow(
-                modifier = Modifier.weight(1f),
+            Row(
+                modifier = Modifier.weight(1f).horizontalScroll(
+                    scrollState
+                ),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(end = 16.dp)
             ) {
-                items(levelViewModel.bottomBarItems.size) { index ->
+                levelViewModel.bottomBarItems.forEachIndexed() { index, _ ->
                     val direction = levelViewModel.bottomBarItems[index]
                     DirectionTile(direction = direction, levelViewModel = levelViewModel)
                 }
